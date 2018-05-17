@@ -1,6 +1,9 @@
 Blankningsregistret
 ===============
 
+[![Build Status](https://travis-ci.org/w3stling/blankningsregistret.svg?branch=master)](https://travis-ci.org/w3stling/blankningxssregistret)
+
+
 [Blankningsregistret][1] is a Swedish financial registry maintained by
 the [Finansinspektionen][2] (FI). It contains information short selling.
 
