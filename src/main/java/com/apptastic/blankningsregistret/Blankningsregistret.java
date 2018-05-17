@@ -30,6 +30,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.zip.GZIPInputStream;
@@ -46,10 +48,10 @@ public class Blankningsregistret {
     private static final int INDEX_COMMENT = 6;
     private SimpleDateFormat dateFormat;
 
+
     public Blankningsregistret() {
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     }
-
 
     public Stream<NetShortPosition> search() {
         Calendar searchDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/Stockholm"));
@@ -78,7 +80,10 @@ public class Blankningsregistret {
                 }
             }
             catch (IOException e) {
+                Logger logger = Logger.getLogger("com.apptastic.blankningsregistret");
 
+                if (logger.isLoggable(Level.FINER))
+                    logger.log(Level.FINER, "Failed to parse file. ", e);
             }
 
             searchDate.add(Calendar.DAY_OF_YEAR, -1);
@@ -111,6 +116,11 @@ public class Blankningsregistret {
             position = Double.parseDouble(row[INDEX_POSITION].replace(',', '.').trim());
         }
         catch (NumberFormatException e) {
+            Logger logger = Logger.getLogger("com.apptastic.blankningsregistret");
+
+            if (logger.isLoggable(Level.WARNING))
+                logger.log(Level.WARNING, "Failed to parse net short position. ", e);
+
             return null;
         }
 

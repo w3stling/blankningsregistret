@@ -38,11 +38,13 @@ import java.io.*;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class ExcelFileReader {
-
     private InputStream file;
+    
 
     public ExcelFileReader(InputStream file) {
         this.file = file;
@@ -58,12 +60,13 @@ public class ExcelFileReader {
         private SharedStringsTable sst;
         private XMLEventReader eventReader;
         private boolean nextIsString;
-        private String lastContents;
+        private StringBuilder lastContentsBuilder;
         private List<String> cellCache = new LinkedList<>();
         private String[] nextRow;
 
         ExcelFileIterator(InputStream is) {
             nextRow = null;
+            lastContentsBuilder = new StringBuilder();
 
             try {
                 OPCPackage pkg = OPCPackage.open(is);
@@ -77,7 +80,11 @@ public class ExcelFileReader {
                 eventReader = inputFactory.createXMLEventReader(sheetSource.getByteStream());
             }
             catch (Exception e) {
-                e.printStackTrace();
+                Logger logger = Logger.getLogger("com.apptastic.blankningsregistret");
+
+                if (logger.isLoggable(Level.WARNING))
+                    logger.log(Level.WARNING, "Failed to parse file. ", e);
+
             }
         }
 
@@ -110,50 +117,69 @@ public class ExcelFileReader {
                 }
 
                 if (event.isStartElement()) {
-                    StartElement startElement = event.asStartElement();
-
-                    // c => cell
-                    if (startElement.getName().getLocalPart().equals(CELL_EVENT)) {
-                        Attribute attribute = startElement.getAttributeByName(QName.valueOf("t"));
-                        String cellType = (attribute != null) ? attribute.getValue() : "";
-                        nextIsString = cellType != null && cellType.equals("s");
-                    }
-                    // row => row
-                    else if (startElement.getName().getLocalPart().equals(ROW_EVENT)) {
-                        cellCache.clear();
-                    }
-
-                    // Clear contents cache
-                    lastContents = "";
+                    parseStartElement(event);
                 }
                 else if (event.isEndElement()) {
-                    EndElement endElement = event.asEndElement();
+                    row = parseEndElement(event);
 
-                    // Process the last contents as required.
-                    // Do now, as characters() may be called more than once
-                    if (nextIsString) {
-                        int idx = Integer.parseInt(lastContents.trim());
-                        lastContents = new XSSFRichTextString(sst.getEntryAt(idx)).toString();
-                        nextIsString = false;
-                    }
-
-                    // v => contents of a cell
-                    // Output after we've seen the string contents
-                    if (endElement.getName().getLocalPart().equals("v"))
-                        cellCache.add(lastContents);
-                    else if (endElement.getName().getLocalPart().equals(ROW_EVENT)) {
-                        row = cellCache.toArray(new String[cellCache.size()]);
+                    if (row != null)
                         break;
-                    }
-
                 }
                 else if (event.isCharacters()) {
-                    Characters character = event.asCharacters();
-                    lastContents += character.getData();
+                    parseCharacters(event);
                 }
             }
 
             return row;
+        }
+
+        private void parseStartElement(XMLEvent event) {
+            StartElement startElement = event.asStartElement();
+
+            // c => cell
+            if (startElement.getName().getLocalPart().equals(CELL_EVENT)) {
+                Attribute attribute = startElement.getAttributeByName(QName.valueOf("t"));
+                String cellType = (attribute != null) ? attribute.getValue() : "";
+                nextIsString = cellType != null && cellType.equals("s");
+            }
+            // row => row
+            else if (startElement.getName().getLocalPart().equals(ROW_EVENT)) {
+                cellCache.clear();
+            }
+
+            // Clear contents cache
+            lastContentsBuilder.setLength(0);
+        }
+
+        private String[] parseEndElement(XMLEvent event) {
+            String[] row = null;
+            EndElement endElement = event.asEndElement();
+
+            // Process the last contents as required.
+            // Do now, as characters() may be called more than once
+            if (nextIsString) {
+                int idx = Integer.parseInt(lastContentsBuilder.toString().trim());
+                XSSFRichTextString text = new XSSFRichTextString(sst.getEntryAt(idx));
+                lastContentsBuilder.setLength(0);
+                lastContentsBuilder.append(text.toString());
+                nextIsString = false;
+            }
+
+            // v => contents of a cell
+            // Output after we've seen the string contents
+            if (endElement.getName().getLocalPart().equals("v")) {
+                cellCache.add(lastContentsBuilder.toString());
+            }
+            else if (endElement.getName().getLocalPart().equals(ROW_EVENT)) {
+                row = cellCache.toArray(new String[cellCache.size()]);
+            }
+
+            return row;
+        }
+
+        private void parseCharacters(XMLEvent event) {
+            Characters character = event.asCharacters();
+            lastContentsBuilder.append(character.getData());
         }
     }
 }

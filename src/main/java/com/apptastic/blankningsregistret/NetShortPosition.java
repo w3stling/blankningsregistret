@@ -25,6 +25,7 @@ package com.apptastic.blankningsregistret;
 
 import java.util.Objects;
 
+
 public class NetShortPosition implements Comparable<NetShortPosition> {
     private String publicationDate;
     private String positionHolder;
