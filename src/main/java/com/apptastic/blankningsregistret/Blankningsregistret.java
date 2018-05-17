@@ -37,7 +37,6 @@ import java.util.zip.GZIPInputStream;
 
 public class Blankningsregistret {
     private static final String URL_FORMAT = "https://www.fi.se/contentassets/71a61417bb4c49c0a4a3a2582ea8af6c/korta_positioner_%1$s.xlsx";
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final int INDEX_PUBLICATION_DATE = 0;
     private static final int INDEX_POSITION_HOLDER = 1;
     private static final int INDEX_ISSUER = 2;
@@ -45,9 +44,10 @@ public class Blankningsregistret {
     private static final int INDEX_POSITION = 4;
     private static final int INDEX_POSITION_DATE = 5;
     private static final int INDEX_COMMENT = 6;
+    private SimpleDateFormat dateFormat;
 
     public Blankningsregistret() {
-
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     }
 
 
@@ -63,7 +63,7 @@ public class Blankningsregistret {
 
         for (int i = 0; i < maxPreviousDays + 1; ++i) {
             try {
-                String searchDateString = DATE_FORMAT.format(searchDate.getTime());
+                String searchDateString = dateFormat.format(searchDate.getTime());
                 String url = String.format(URL_FORMAT, searchDateString);
                 InputStream is = sendRequest(url);
 
@@ -95,7 +95,7 @@ public class Blankningsregistret {
         Calendar epoch = new GregorianCalendar(1899,11,30);
         epoch.add(Calendar.DAY_OF_YEAR, Integer.valueOf(date));
 
-        return DATE_FORMAT.format(epoch.getTime());
+        return dateFormat.format(epoch.getTime());
     }
 
 

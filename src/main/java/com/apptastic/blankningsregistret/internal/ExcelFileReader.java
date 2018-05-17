@@ -86,7 +86,7 @@ public class ExcelFileReader {
             if (nextRow == null)
                 nextRow = next();
 
-            return nextRow != null;
+            return nextRow != null && nextRow.length != 0;
         }
 
         @Override
@@ -106,7 +106,7 @@ public class ExcelFileReader {
                     event = eventReader.nextEvent();
                 }
                 catch (XMLStreamException e) {
-                    return null;
+                    return new String[] { };
                 }
 
                 if (event.isStartElement()) {
