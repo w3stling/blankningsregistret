@@ -1,7 +1,8 @@
 Blankningsregistret
 ===============
 
-[![Build Status](https://travis-ci.org/w3stling/blankningsregistret.svg?branch=master)](https://travis-ci.org/w3stling/blankningxssregistret)
+[![Build Status](https://travis-ci.org/w3stling/blankningsregistret.svg?branch=master)](https://travis-ci.org/w3stling/blankningsregistret)
+[![License](http://img.shields.io/:license-MIT-blue.svg?style=flat-round)](http://apptastic-software.mit-license.org)
 
 
 [Blankningsregistret][1] is a Swedish financial registry maintained by
