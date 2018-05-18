@@ -69,6 +69,21 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
     }
 
     /**
+     * Copy constructor
+     *
+     * @param o net short position
+     */
+    public NetShortPosition(NetShortPosition o) {
+        this.publicationDate = o.publicationDate;
+        this.positionHolder = o.positionHolder;
+        this.issuer = o.issuer;
+        this.isin = o.isin;
+        this.positionInPercent = o.positionInPercent;
+        this.positionDate = o.positionDate;
+        this.comment = o.comment;
+    }
+
+    /**
      * Get the publication date for this position. Usually one day after the position date. Format YYYY-MM-DD.
      * @return publication date
      */

@@ -153,4 +153,13 @@ public class NetShortPositionTest {
 
         assertEquals("2018-05-11", position.getPositionDate());
     }
+
+
+    @Test
+    public void copy() {
+        NetShortPosition position1 = new NetShortPosition();
+        NetShortPosition position2 = new NetShortPosition(position1);
+
+        assertEquals(position1, position2);
+    }
 }
