@@ -23,7 +23,7 @@ This Java library makes it easier to automate data extraction from Blankningsreg
 Examples
 --------
 
-### Search transactions
+### Search short positions
 Get all net short positions published.
 
 ```java
