@@ -37,6 +37,9 @@ import java.util.stream.StreamSupport;
 import java.util.zip.GZIPInputStream;
 
 
+/**
+ * Class for searching published net short position in the short selling registry (swedish Blankningsregistret) publish by Financial Supervisory Authority (Finansinspektionen).
+ */
 public class Blankningsregistret {
     private static final String URL_FORMAT = "https://www.fi.se/contentassets/71a61417bb4c49c0a4a3a2582ea8af6c/korta_positioner_%1$s.xlsx";
     private static final int INDEX_PUBLICATION_DATE = 0;
@@ -49,16 +52,35 @@ public class Blankningsregistret {
     private SimpleDateFormat dateFormat;
 
 
+    /**
+     * Default constructor.
+     */
     public Blankningsregistret() {
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     }
 
+    /**
+     * Searches for published net search positions from today's date.
+     *
+     * If the positions has not been yet been published for today then try the previous day.
+     * Maximum 30 day back from today's date.
+     * @return stream of net short positions
+     */
     public Stream<NetShortPosition> search() {
         Calendar searchDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/Stockholm"));
 
         return search(searchDate.getTime(), 30);
     }
 
+    /**
+     * Searches for published net search positions from the given date.
+     *
+     * If the positions has not yet been been published for the given date then try the previous day
+     * up until the given max number of previous days.
+     * @param date date to search from
+     * @param maxPreviousDays
+     * @return stream of net short positions
+     */
     public Stream<NetShortPosition> search(Date date, int maxPreviousDays) {
         Calendar searchDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/Stockholm"));
         searchDate.setTime(date);

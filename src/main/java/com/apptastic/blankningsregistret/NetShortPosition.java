@@ -26,83 +26,156 @@ package com.apptastic.blankningsregistret;
 import java.util.Objects;
 
 
+/**
+ * Class represent the net short position.
+ */
 public class NetShortPosition implements Comparable<NetShortPosition> {
     private String publicationDate;
     private String positionHolder;
     private String issuer;
     private String isin;
-    private double position;
+    private double positionInPercent;
     private String positionDate;
     private String comment;
 
+    /**
+     * Default constructor
+     */
     public NetShortPosition() {
 
     }
 
+    /**
+     * Constructor
+     *
+     * @param publicationDate publication date
+     * @param positionHolder position holder name
+     * @param issuer issuer name
+     * @param isin ISIN number
+     * @param positionInPercent position in percent
+     * @param positionDate position date
+     * @param comment comment
+     */
     public NetShortPosition(String publicationDate, String positionHolder, String issuer, String isin,
-                            double position, String positionDate, String comment) {
+                            double positionInPercent, String positionDate, String comment) {
 
         this.publicationDate = publicationDate;
         this.positionHolder = positionHolder;
         this.issuer = issuer;
         this.isin = isin;
-        this.position = position;
+        this.positionInPercent = positionInPercent;
         this.positionDate = positionDate;
         this.comment = comment;
     }
 
+    /**
+     * Get the publication date for this position. Usually one day after the position date. Format YYYY-MM-DD.
+     * @return publication date
+     */
     public String getPublicationDate() {
         return publicationDate;
     }
 
+    /**
+     * Set the publication date for this position.
+     * @param publicationDate publication date
+     */
     public void setPublicationDate(String publicationDate) {
         this.publicationDate = publicationDate;
     }
 
+    /**
+     * Name of the position holder. For example Goldman Sachs International.
+     * @return position holder name
+     */
     public String getPositionHolder() {
         return positionHolder;
     }
 
+    /**
+     * Name of the position holder. For example Goldman Sachs International.
+     * @param positionHolder position holder name
+     */
     public void setPositionHolder(String positionHolder) {
         this.positionHolder = positionHolder;
     }
 
+    /**
+     * Get issuer for this position.
+     * @return issuer
+     */
     public String getIssuer() {
         return issuer;
     }
 
+    /**
+     * Set issuer for this position.
+     * @param issuer issuer
+     */
     public void setIssuer(String issuer) {
         this.issuer = issuer;
     }
 
+    /**
+     * Get ISIN for this position.
+     * @return ISIN number
+     */
     public String getIsin() {
         return isin;
     }
 
+    /**
+     * Set ISIN for this position.
+     * @param isin ISIN number
+     */
     public void setIsin(String isin) {
         this.isin = isin;
     }
 
-    public double getPosition() {
-        return position;
+    /**
+     * Get the net position in percent.
+     * @return position in percent
+     */
+    public double getPositionInPercent() {
+        return positionInPercent;
     }
 
-    public void setPosition(double position) {
-        this.position = position;
+    /**
+     * Set the net position in percent.
+     * @param positionInPercent position in percent
+     */
+    public void setPositionInPercent(double positionInPercent) {
+        this.positionInPercent = positionInPercent;
     }
 
+    /**
+     * Get date for this position in format YYYY-DD-MM.
+     * @return date
+     */
     public String getPositionDate() {
         return positionDate;
     }
 
+    /**
+     * Set date for this position.
+     * @param positionDate date
+     */
     public void setPositionDate(String positionDate) {
         this.positionDate = positionDate;
     }
 
+    /**
+     * Get comment for this net short position.
+     * @return comment
+     */
     public String getComment() {
         return comment;
     }
 
+    /**
+     * Set comment for this net short position.
+     * @param comment comment
+     */
     public void setComment(String comment) {
         this.comment = comment;
     }
@@ -114,7 +187,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
         if (!(o instanceof NetShortPosition)) return false;
 
         NetShortPosition that = (NetShortPosition) o;
-        return Double.compare(that.getPosition(), getPosition()) == 0 &&
+        return Double.compare(that.getPositionInPercent(), getPositionInPercent()) == 0 &&
                 Objects.equals(getPublicationDate(), that.getPublicationDate()) &&
                 Objects.equals(getPositionHolder(), that.getPositionHolder()) &&
                 Objects.equals(getIssuer(), that.getIssuer()) &&
@@ -125,7 +198,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPublicationDate(), getPositionHolder(), getIssuer(), getIsin(), getPosition(),
+        return Objects.hash(getPublicationDate(), getPositionHolder(), getIssuer(), getIsin(), getPositionInPercent(),
                 getPositionDate(), getComment());
     }
 
