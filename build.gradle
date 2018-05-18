@@ -72,7 +72,7 @@ bintray {
     if (!project.version.endsWith("-SNAPSHOT")) {
         user = System.getenv('BINTRAY_USER')
         key = System.getenv('BINTRAY_KEY')
-        publications = ['BlankningsPublication']
+        publications = ['BlankningsregistretPublication']
         dryRun = false
         publish = true
         override = true
