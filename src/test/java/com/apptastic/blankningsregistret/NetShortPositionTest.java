@@ -70,7 +70,7 @@ public class NetShortPositionTest {
         }
         {
             NetShortPosition position2 = defaultNetShortPosition();
-            position2.setPosition(1.23);
+            position2.setPositionInPercent(1.23);
             assertNotEquals(position1, position2);
         }
         {

@@ -58,7 +58,7 @@ public class BlankningsregistretTest {
             assertTrue(position.getPositionHolder().length() > 3);
             assertTrue(position.getIssuer().length() > 3);
             assertEquals(12, position.getIsin().length());
-            assertTrue(position.getPosition() >= 0.0);
+            assertTrue(position.getPositionInPercent() >= 0.0);
             assertEquals(10, position.getPositionDate().length());
             assertTrue(datePattern.matcher(position.getPositionDate()).find());
             assertTrue(position.getComment().isEmpty() || position.getComment().length() > 3);
