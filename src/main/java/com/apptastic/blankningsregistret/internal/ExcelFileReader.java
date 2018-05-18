@@ -38,6 +38,7 @@ import java.io.*;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -90,10 +91,19 @@ public class ExcelFileReader {
 
         @Override
         public boolean hasNext() {
-            if (nextRow == null)
-                nextRow = next();
-
+            peekNext();
             return nextRow != null && nextRow.length != 0;
+        }
+
+        void peekNext() {
+            if (nextRow == null) {
+                try {
+                    nextRow = next();
+                }
+                catch (NoSuchElementException e) {
+                    nextRow = null;
+                }
+            }
         }
 
         @Override
@@ -130,6 +140,9 @@ public class ExcelFileReader {
                 }
             }
 
+            if (row == null)
+                throw new NoSuchElementException();
+            
             return row;
         }
 
