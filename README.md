@@ -2,7 +2,13 @@ Blankningsregistret
 ===============
 
 [![Build Status](https://travis-ci.org/w3stling/blankningsregistret.svg?branch=master)](https://travis-ci.org/w3stling/blankningsregistret)
+[![Javadoc](https://img.shields.io/badge/javadoc-1.0.0-blue.svg)](https://w3stling.github.io/blankningsregistret/javadoc/1.0.0-SNAPSHOT)
 [![License](http://img.shields.io/:license-MIT-blue.svg?style=flat-round)](http://apptastic-software.mit-license.org)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.apptastic%3Ablankningsregistret&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.apptastic%3Ablankningsregistret)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.apptastic%3Ablankningsregistret&metric=coverage)](https://sonarcloud.io/component_measures?id=com.apptastic%3Ablankningsregistret&metric=Coverage)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com.apptastic%3Ablankningsregistret&metric=bugs)](https://sonarcloud.io/component_measures?id=com.apptastic%3Ablankningsregistret&metric=bugs)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=com.apptastic%3Ablankningsregistret&metric=vulnerabilities)](https://sonarcloud.io/component_measures?id=com.apptastic%3Ablankningsregistret&metric=vulnerabilities)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=com.apptastic%3Ablankningsregistret&metric=code_smells)](https://sonarcloud.io/component_measures?id=com.apptastic%3Ablankningsregistret&metric=code_smells)
 
 
 [Blankningsregistret][1] is a Swedish financial registry maintained by
@@ -105,7 +111,7 @@ dependencies {
 }
 ```
 
-Insynsregistret library requires at minimum Java 8.
+Blankningsregistret library requires at minimum Java 8.
 
 License
 -------
