@@ -25,7 +25,11 @@ package com.apptastic.blankningsregistret;
 
 import org.junit.Test;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.toList;
@@ -36,6 +40,10 @@ public class BlankningsregistretTest {
 
     @Test
     public void search() {
+        Logger logger = Logger.getLogger("com.apptastic.blankningsregistret");
+        Level defaultLevel = logger.getLevel();
+        logger.setLevel(Level.FINEST);
+
         Blankningsregistret br = new Blankningsregistret();
 
         List<NetShortPosition> positions = br.search().collect(toList());
@@ -55,5 +63,18 @@ public class BlankningsregistretTest {
             assertTrue(datePattern.matcher(position.getPositionDate()).find());
             assertTrue(position.getComment().isEmpty() || position.getComment().length() > 3);
         }
+
+        logger.setLevel(defaultLevel);
+    }
+
+    @Test
+    public void searchNotYetPublished() {
+        Calendar searchDateTomorrow = Calendar.getInstance(TimeZone.getTimeZone("Europe/Stockholm"));
+        searchDateTomorrow.add(Calendar.DAY_OF_YEAR, 1);
+
+        Blankningsregistret br = new Blankningsregistret();
+
+        List<NetShortPosition> positions = br.search(searchDateTomorrow.getTime(), 0).collect(toList());
+        assertEquals(0, positions.size());
     }
 }
