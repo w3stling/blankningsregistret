@@ -65,7 +65,7 @@ Download
 
 Download [the latest JAR][3] or grab via [Maven][4] or [Gradle][5].
 
-### Maven
+### Maven setup
 Add repository for resolving artifact:
 ```xml
 <project>
@@ -95,7 +95,7 @@ Add dependency declaration:
 </project>
 ```
 
-### Gradle
+### Gradle setup
 Add repository for resolving artifact:
 ```groovy
 repositories {
