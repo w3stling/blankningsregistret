@@ -127,6 +127,9 @@ public class Blankningsregistret {
 
 
     private NetShortPosition createNetShortPosition(String[] row) {
+        if (row[INDEX_PUBLICATION_DATE].length() > 28)
+            return null;
+
         String comment = (row.length == 7) ? row[INDEX_COMMENT].trim() : "";
         double position;
         String publicationDate;
