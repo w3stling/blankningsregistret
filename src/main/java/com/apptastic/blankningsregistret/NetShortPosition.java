@@ -92,7 +92,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
     }
 
     /**
-     * Set the publication date for this position.
+     * Set the publication date for this position. Format YYYY-MM-DD.
      * @param publicationDate publication date
      */
     public void setPublicationDate(String publicationDate) {
@@ -116,7 +116,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
     }
 
     /**
-     * Get issuer for this position.
+     * Get issuer for this position. For example Alfa Laval AB.
      * @return issuer
      */
     public String getIssuer() {
@@ -124,7 +124,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
     }
 
     /**
-     * Set issuer for this position.
+     * Set issuer for this position. For example Alfa Laval AB.
      * @param issuer issuer
      */
     public void setIssuer(String issuer) {
@@ -132,7 +132,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
     }
 
     /**
-     * Get ISIN for this position.
+     * Get ISIN for this position. For example SE0000695876.
      * @return ISIN number
      */
     public String getIsin() {
@@ -140,7 +140,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
     }
 
     /**
-     * Set ISIN for this position.
+     * Set ISIN for this position. For example SE0000695876.
      * @param isin ISIN number
      */
     public void setIsin(String isin) {
@@ -172,7 +172,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
     }
 
     /**
-     * Set date for this position.
+     * Set date for this position in format YYYY-DD-MM.
      * @param positionDate date
      */
     public void setPositionDate(String positionDate) {
