@@ -53,6 +53,9 @@ public class BlankningsregistretTest {
         Pattern datePattern = Pattern.compile("20\\d{2}-\\d{2}-\\d{2}");
 
         for (NetShortPosition position : positions) {
+            if (position.getPositionDate().equals("2394-06-24") && position.getPublicationDate().equals("2018-06-15"))
+                continue; // Ignore this known bad data.
+
             assertEquals(10, position.getPublicationDate().length());
             assertTrue(datePattern.matcher(position.getPublicationDate()).find());
             assertTrue(position.getPositionHolder().length() > 3);
