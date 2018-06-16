@@ -4,7 +4,6 @@ plugins {
     id 'com.jfrog.artifactory' version '4.7.3'
     id 'org.ajoberstar.git-publish' version '1.0.1'
     id 'net.researchgate.release' version '2.7.0'
-    id 'me.champeau.gradle.jmh' version '0.4.5'
 }
 
 apply plugin: 'java'
@@ -12,7 +11,6 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'jacoco'
 apply plugin: 'distribution'
-apply plugin: 'me.champeau.gradle.jmh'
 
 group 'com.apptastic'
 version "${version}"
