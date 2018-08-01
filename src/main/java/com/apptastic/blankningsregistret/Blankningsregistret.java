@@ -161,6 +161,9 @@ public class Blankningsregistret {
      */
     protected InputStream sendRequest(String url) throws IOException {
         URLConnection connection = new URL(url).openConnection();
+
+        connection.setConnectTimeout(10 * 1000);
+        connection.setReadTimeout(10 * 1000);
         connection.setRequestProperty("Accept-Encoding", "gzip");
         InputStream inputStream = connection.getInputStream();
 
