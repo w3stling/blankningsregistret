@@ -23,6 +23,7 @@
  */
 package com.apptastic.blankningsregistret.internal;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.model.SharedStringsTable;
@@ -73,8 +74,7 @@ public class ExcelFileReader {
                 OPCPackage pkg = OPCPackage.open(is);
                 XSSFReader reader = new XSSFReader(pkg);
                 sst = reader.getSharedStringsTable();
-                Iterator<InputStream> sheetIterator = reader.getSheetsData();
-                InputStream sheetInputStream = sheetIterator.next();
+                InputStream sheetInputStream = findSheet(reader, "blankning");
                 BufferedInputStream bisSheet = new BufferedInputStream(sheetInputStream);
                 InputSource sheetSource = new InputSource(bisSheet);
                 XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -85,8 +85,22 @@ public class ExcelFileReader {
 
                 if (logger.isLoggable(Level.WARNING))
                     logger.log(Level.WARNING, "Failed to parse file. ", e);
-
             }
+        }
+
+        private InputStream findSheet(XSSFReader reader, String sheetName) throws IOException, InvalidFormatException {
+            InputStream sheetInputStream = null;
+            XSSFReader.SheetIterator sheetIterator = (XSSFReader.SheetIterator) reader.getSheetsData();
+
+            while (sheetIterator.hasNext()) {
+                sheetInputStream = sheetIterator.next();
+                String name = sheetIterator.getSheetName();
+
+                if (name.toLowerCase().contains(sheetName))
+                    break;
+            }
+
+            return sheetInputStream;
         }
 
         @Override
