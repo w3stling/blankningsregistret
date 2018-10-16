@@ -74,7 +74,7 @@ public class ExcelFileReader {
                 OPCPackage pkg = OPCPackage.open(is);
                 XSSFReader reader = new XSSFReader(pkg);
                 sst = reader.getSharedStringsTable();
-                InputStream sheetInputStream = findSheet(reader, "blankning");
+                InputStream sheetInputStream = findSheet(reader, "Blad1");
                 BufferedInputStream bisSheet = new BufferedInputStream(sheetInputStream);
                 InputSource sheetSource = new InputSource(bisSheet);
                 XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -106,7 +106,7 @@ public class ExcelFileReader {
         @Override
         public boolean hasNext() {
             peekNext();
-            return nextRow != null && nextRow.length != 0;
+            return nextRow != null;
         }
 
         void peekNext() {

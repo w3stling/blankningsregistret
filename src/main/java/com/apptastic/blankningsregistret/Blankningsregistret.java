@@ -41,14 +41,14 @@ import java.util.zip.GZIPInputStream;
  * Class for searching published net short position in the short selling registry (swedish Blankningsregistret) publish by Financial Supervisory Authority (Finansinspektionen).
  */
 public class Blankningsregistret {
-    private static final String URL_FORMAT = "https://www.fi.se/contentassets/71a61417bb4c49c0a4a3a2582ea8af6c/korta_positioner_%1$s.xlsx";
-    private static final int INDEX_PUBLICATION_DATE = 0;
-    private static final int INDEX_POSITION_HOLDER = 1;
-    private static final int INDEX_ISSUER = 2;
-    private static final int INDEX_ISIN = 3;
-    private static final int INDEX_POSITION = 4;
-    private static final int INDEX_POSITION_DATE = 5;
-    private static final int INDEX_COMMENT = 6;
+    private static final String URL_ACTIVE_FORMAT = "https://www.fi.se/contentassets/71a61417bb4c49c0a4a3a2582ea8af6c/aktuella_positioner_%1$s.xlsx";
+    private static final String URL_HISTORICAL_FORMAT = "https://www.fi.se/contentassets/71a61417bb4c49c0a4a3a2582ea8af6c/historiska_positioner_%1$s.xlsx";
+    private static final int INDEX_POSITION_HOLDER = 0;
+    private static final int INDEX_ISSUER = 1;
+    private static final int INDEX_ISIN = 2;
+    private static final int INDEX_POSITION = 3;
+    private static final int INDEX_POSITION_DATE = 4;
+    private static final int INDEX_COMMENT = 5;
     private SimpleDateFormat dateFormat;
 
 
@@ -88,18 +88,10 @@ public class Blankningsregistret {
         for (int i = 0; i < maxPreviousDays + 1; ++i) {
             try {
                 String searchDateString = dateFormat.format(searchDate.getTime());
-                String url = String.format(URL_FORMAT, searchDateString);
-                InputStream is = sendRequest(url);
+                Stream<NetShortPosition> active = getStream(URL_ACTIVE_FORMAT, searchDateString);
+                Stream<NetShortPosition> historical = getStream(URL_HISTORICAL_FORMAT, searchDateString);
 
-                if (is != null) {
-                    ExcelFileReader reader = new ExcelFileReader(is);
-                    Iterator<String[]> rowIterator = reader.getIterator();
-                    Stream<String[]> targetStream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(rowIterator, Spliterator.ORDERED), false);
-
-                    return targetStream.filter(r -> r.length == 6 || r.length == 7)
-                            .map(this::createNetShortPosition)
-                            .filter(Objects::nonNull);
-                }
+                return Stream.concat(active, historical).sorted(Comparator.comparing(NetShortPosition::getPositionDate).reversed());
             }
             catch (IOException e) {
                 Logger logger = Logger.getLogger("com.apptastic.blankningsregistret");
@@ -114,6 +106,22 @@ public class Blankningsregistret {
         return Stream.empty();
     }
 
+    private Stream<NetShortPosition> getStream(String urlFormat, String searchDateString) throws IOException {
+        String url = String.format(urlFormat, searchDateString);
+        InputStream is = sendRequest(url);
+
+        if (is != null) {
+            ExcelFileReader reader = new ExcelFileReader(is);
+            Iterator<String[]> rowIterator = reader.getIterator();
+            Stream<String[]> targetStream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(rowIterator, Spliterator.ORDERED), false);
+
+            return targetStream.filter(r -> r.length == 5 || r.length == 6)
+                    .map(this::createNetShortPosition)
+                    .filter(Objects::nonNull);
+        }
+
+        return Stream.empty();
+    }
 
     private String toDate(String date) {
         if (date.length() == 10)
@@ -127,18 +135,16 @@ public class Blankningsregistret {
 
 
     private NetShortPosition createNetShortPosition(String[] row) {
-        if (row[INDEX_PUBLICATION_DATE].length() > 28)
+        if (row[0].length() == 43 && row[0].startsWith("Innehavare"))
             return null;
 
-        String comment = (row.length == 7) ? row[INDEX_COMMENT].trim() : "";
+        String comment = (row.length == 6) ? row[INDEX_COMMENT].trim() : "";
         double position;
-        String publicationDate;
         String positionDate;
 
         try {
-            publicationDate = toDate(row[INDEX_PUBLICATION_DATE].trim());
             positionDate = toDate(row[INDEX_POSITION_DATE].trim());
-            position = Double.parseDouble(row[INDEX_POSITION].replace(',', '.').trim());
+            position = toPosition(row[INDEX_POSITION]);
         }
         catch (NumberFormatException e) {
             Logger logger = Logger.getLogger("com.apptastic.blankningsregistret");
@@ -149,9 +155,17 @@ public class Blankningsregistret {
             return null;
         }
 
-        return new NetShortPosition(publicationDate, row[INDEX_POSITION_HOLDER].trim(), row[INDEX_ISSUER].trim(), row[INDEX_ISIN].trim(), position, positionDate, comment);
+        return new NetShortPosition(null, row[INDEX_POSITION_HOLDER].trim(), row[INDEX_ISSUER].trim(), row[INDEX_ISIN].trim(), position, positionDate, comment);
     }
 
+    private double toPosition(String text) {
+        text = text.trim();
+
+        if (text.charAt(0) == '<')
+            text = text.substring(1);
+
+        return Double.parseDouble(text.replace(',', '.'));
+    }
 
     /**
      * Internal method for sending the http request.

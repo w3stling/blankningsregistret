@@ -85,16 +85,20 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
 
     /**
      * Get the publication date for this position. Usually one day after the position date. Format YYYY-MM-DD.
+     * @deprecated Method will be removed in the future due to publication date is no longer available.
      * @return publication date
      */
+    @Deprecated
     public String getPublicationDate() {
         return publicationDate;
     }
 
     /**
      * Set the publication date for this position. Format YYYY-MM-DD.
+     * @deprecated Method will be removed in the future due to publication date is no longer available.
      * @param publicationDate publication date
      */
+    @Deprecated
     public void setPublicationDate(String publicationDate) {
         this.publicationDate = publicationDate;
     }
@@ -203,7 +207,6 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
 
         NetShortPosition that = (NetShortPosition) o;
         return Double.compare(that.getPositionInPercent(), getPositionInPercent()) == 0 &&
-                Objects.equals(getPublicationDate(), that.getPublicationDate()) &&
                 Objects.equals(getPositionHolder(), that.getPositionHolder()) &&
                 Objects.equals(getIssuer(), that.getIssuer()) &&
                 Objects.equals(getIsin(), that.getIsin()) &&
@@ -213,7 +216,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPublicationDate(), getPositionHolder(), getIssuer(), getIsin(), getPositionInPercent(),
+        return Objects.hash(getPositionHolder(), getIssuer(), getIsin(), getPositionInPercent(),
                 getPositionDate(), getComment());
     }
 
