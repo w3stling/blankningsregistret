@@ -50,11 +50,6 @@ public class NetShortPositionTest {
         }
         {
             NetShortPosition position2 = defaultNetShortPosition();
-            position2.setPublicationDate("2018-05-12");
-            assertNotEquals(position1, position2);
-        }
-        {
-            NetShortPosition position2 = defaultNetShortPosition();
             position2.setPositionHolder("JPMorgan Asset Management");
             assertNotEquals(position1, position2);
         }
