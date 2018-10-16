@@ -4,7 +4,7 @@ Blankningsregistret
 [![Build Status](https://travis-ci.org/w3stling/blankningsregistret.svg?branch=master)](https://travis-ci.org/w3stling/blankningsregistret)
 [![Download](https://api.bintray.com/packages/apptastic/maven-repo/blankningsregistret/images/download.svg)](https://bintray.com/apptastic/maven-repo/blankningsregistret/_latestVersion)
 [![Javadoc](https://img.shields.io/badge/javadoc-1.0.7-blue.svg)](https://w3stling.github.io/blankningsregistret/javadoc/1.0.7)
-[![License](http://img.shields.io/:license-MIT-blue.svg?style=flat-round)](http://apptastic-software.mit-license.org)
+[![License](http://img.shields.io/:license-MIT-blue.svg?style=flat-round)](http://apptastic-software.mit-license.org)   
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.apptastic%3Ablankningsregistret&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.apptastic%3Ablankningsregistret)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.apptastic%3Ablankningsregistret&metric=coverage)](https://sonarcloud.io/component_measures?id=com.apptastic%3Ablankningsregistret&metric=Coverage)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com.apptastic%3Ablankningsregistret&metric=bugs)](https://sonarcloud.io/component_measures?id=com.apptastic%3Ablankningsregistret&metric=bugs)
