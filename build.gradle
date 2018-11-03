@@ -73,6 +73,13 @@ compileJava {
     }
 }
 
+javadoc {
+    inputs.property("moduleName", moduleName)
+    doFirst {
+        options.addStringOption('-module-path', classpath.asPath)
+    }
+}
+
 jacoco {
     toolVersion = "0.8.2"
 }
