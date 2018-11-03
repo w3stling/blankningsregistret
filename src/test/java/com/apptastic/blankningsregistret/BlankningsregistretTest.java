@@ -62,7 +62,7 @@ public class BlankningsregistretTest {
             assertTrue(position.getPositionInPercent() >= 0.0);
             assertEquals(10, position.getPositionDate().length());
             assertTrue(datePattern.matcher(position.getPositionDate()).find());
-            assertTrue(position.getComment().isEmpty() || position.getComment().length() > 3);
+            assertTrue(position.getComment().isEmpty() || position.getComment().get().length() > 3);
         }
 
         logger.setLevel(defaultLevel);

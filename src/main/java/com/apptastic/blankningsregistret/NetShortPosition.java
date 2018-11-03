@@ -24,13 +24,13 @@
 package com.apptastic.blankningsregistret;
 
 import java.util.Objects;
+import java.util.Optional;
 
 
 /**
  * Class represent the net short position.
  */
 public class NetShortPosition implements Comparable<NetShortPosition> {
-    private String publicationDate;
     private String positionHolder;
     private String issuer;
     private String isin;
@@ -59,7 +59,6 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
     public NetShortPosition(String publicationDate, String positionHolder, String issuer, String isin,
                             double positionInPercent, String positionDate, String comment) {
 
-        this.publicationDate = publicationDate;
         this.positionHolder = positionHolder;
         this.issuer = issuer;
         this.isin = isin;
@@ -74,33 +73,12 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
      * @param o net short position
      */
     public NetShortPosition(NetShortPosition o) {
-        this.publicationDate = o.publicationDate;
         this.positionHolder = o.positionHolder;
         this.issuer = o.issuer;
         this.isin = o.isin;
         this.positionInPercent = o.positionInPercent;
         this.positionDate = o.positionDate;
         this.comment = o.comment;
-    }
-
-    /**
-     * Get the publication date for this position. Usually one day after the position date. Format YYYY-MM-DD.
-     * @deprecated Method will be removed in the future due to publication date is no longer available.
-     * @return publication date
-     */
-    @Deprecated
-    public String getPublicationDate() {
-        return publicationDate;
-    }
-
-    /**
-     * Set the publication date for this position. Format YYYY-MM-DD.
-     * @deprecated Method will be removed in the future due to publication date is no longer available.
-     * @param publicationDate publication date
-     */
-    @Deprecated
-    public void setPublicationDate(String publicationDate) {
-        this.publicationDate = publicationDate;
     }
 
     /**
@@ -187,8 +165,8 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
      * Get comment for this net short position.
      * @return comment
      */
-    public String getComment() {
-        return comment;
+    public Optional<String> getComment() {
+        return Optional.ofNullable(comment);
     }
 
     /**

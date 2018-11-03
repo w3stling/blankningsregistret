@@ -26,9 +26,12 @@ package com.apptastic.blankningsregistret;
 import com.apptastic.blankningsregistret.internal.ExcelFileReader;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,12 +46,14 @@ import java.util.zip.GZIPInputStream;
 public class Blankningsregistret {
     private static final String URL_ACTIVE_FORMAT = "https://www.fi.se/contentassets/71a61417bb4c49c0a4a3a2582ea8af6c/aktuella_positioner_%1$s.xlsx";
     private static final String URL_HISTORICAL_FORMAT = "https://www.fi.se/contentassets/71a61417bb4c49c0a4a3a2582ea8af6c/historiska_positioner_%1$s.xlsx";
+    private static final String HTTP_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
     private static final int INDEX_POSITION_HOLDER = 0;
     private static final int INDEX_ISSUER = 1;
     private static final int INDEX_ISIN = 2;
     private static final int INDEX_POSITION = 3;
     private static final int INDEX_POSITION_DATE = 4;
     private static final int INDEX_COMMENT = 5;
+    private final HttpClient httpClient;
     private SimpleDateFormat dateFormat;
 
 
@@ -56,6 +61,9 @@ public class Blankningsregistret {
      * Default constructor.
      */
     public Blankningsregistret() {
+        httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(15))
+                .build();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     }
 
@@ -67,8 +75,7 @@ public class Blankningsregistret {
      * @return stream of net short positions
      */
     public Stream<NetShortPosition> search() {
-        Calendar searchDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/Stockholm"));
-
+        var searchDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/Stockholm"));
         return search(searchDate.getTime(), 30);
     }
 
@@ -82,19 +89,19 @@ public class Blankningsregistret {
      * @return stream of net short positions
      */
     public Stream<NetShortPosition> search(Date date, int maxPreviousDays) {
-        Calendar searchDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/Stockholm"));
+        var searchDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/Stockholm"));
         searchDate.setTime(date);
 
-        for (int i = 0; i < maxPreviousDays + 1; ++i) {
+        for (var i = 0; i < maxPreviousDays + 1; ++i) {
             try {
-                String searchDateString = dateFormat.format(searchDate.getTime());
-                Stream<NetShortPosition> active = getStream(URL_ACTIVE_FORMAT, searchDateString);
-                Stream<NetShortPosition> historical = getStream(URL_HISTORICAL_FORMAT, searchDateString);
+                var searchDateString = dateFormat.format(searchDate.getTime());
+                var active = getStream(URL_ACTIVE_FORMAT, searchDateString);
+                var historical = getStream(URL_HISTORICAL_FORMAT, searchDateString);
 
                 return Stream.concat(active, historical).sorted(Comparator.comparing(NetShortPosition::getPositionDate).reversed());
             }
             catch (IOException e) {
-                Logger logger = Logger.getLogger("com.apptastic.blankningsregistret");
+                var logger = Logger.getLogger("com.apptastic.blankningsregistret");
 
                 if (logger.isLoggable(Level.FINER))
                     logger.log(Level.FINER, "Failed to parse file. ", e);
@@ -107,13 +114,13 @@ public class Blankningsregistret {
     }
 
     private Stream<NetShortPosition> getStream(String urlFormat, String searchDateString) throws IOException {
-        String url = String.format(urlFormat, searchDateString);
-        InputStream is = sendRequest(url);
+        var url = String.format(urlFormat, searchDateString);
+        var is = sendRequest(url);
 
         if (is != null) {
-            ExcelFileReader reader = new ExcelFileReader(is);
-            Iterator<String[]> rowIterator = reader.getIterator();
-            Stream<String[]> targetStream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(rowIterator, Spliterator.ORDERED), false);
+            var reader = new ExcelFileReader(is);
+            var rowIterator = reader.getIterator();
+            var targetStream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(rowIterator, Spliterator.ORDERED), false);
 
             return targetStream.filter(r -> r.length == 5 || r.length == 6)
                     .map(this::createNetShortPosition)
@@ -127,7 +134,7 @@ public class Blankningsregistret {
         if (date.length() == 10)
             return date;
 
-        Calendar epoch = new GregorianCalendar(1899,11,30);
+        var epoch = new GregorianCalendar(1899,11,30);
         epoch.add(Calendar.DAY_OF_YEAR, Integer.valueOf(date));
 
         return dateFormat.format(epoch.getTime());
@@ -138,7 +145,8 @@ public class Blankningsregistret {
         if (row[0].length() == 43 && row[0].startsWith("Innehavare"))
             return null;
 
-        String comment = (row.length == 6) ? row[INDEX_COMMENT].trim() : "";
+        var comment = (row.length == 6) ? row[INDEX_COMMENT].trim() : null;
+        comment = (comment == null || comment.isEmpty()) ? null : comment;
         double position;
         String positionDate;
 
@@ -174,16 +182,29 @@ public class Blankningsregistret {
      * @throws IOException exception
      */
     protected InputStream sendRequest(String url) throws IOException {
-        URLConnection connection = new URL(url).openConnection();
+        var req = HttpRequest.newBuilder(URI.create(url))
+                .timeout(Duration.ofSeconds(15))
+                .header("Accept-Encoding", "gzip")
+                .header("User-Agent", HTTP_USER_AGENT)
+                .GET()
+                .build();
 
-        connection.setConnectTimeout(15 * 1000);
-        connection.setReadTimeout(15 * 1000);
-        connection.setRequestProperty("Accept-Encoding", "gzip");
-        InputStream inputStream = connection.getInputStream();
+        try {
+            var resp = httpClient.send(req, HttpResponse.BodyHandlers.ofInputStream());
 
-        if ("gzip".equals(connection.getContentEncoding()))
-            inputStream = new GZIPInputStream(inputStream);
+            if (resp.statusCode() == 404)
+                throw new IOException("404 - Not Found");
 
-        return inputStream;
+            var inputStream = resp.body();
+
+            if (Optional.of("gzip").equals(resp.headers().firstValue("Content-Encoding")))
+                inputStream = new GZIPInputStream(inputStream);
+
+            return new BufferedInputStream(inputStream);
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException(e);
+        }
     }
 }
