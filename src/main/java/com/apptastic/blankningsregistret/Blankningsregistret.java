@@ -192,7 +192,7 @@ public class Blankningsregistret {
      * @throws IOException exception
      */
     protected InputStream sendRequest(String url) throws IOException {
-        var req = HttpRequest.newBuilder(URI.create(url))
+        var request = HttpRequest.newBuilder(URI.create(url))
                 .timeout(Duration.ofSeconds(15))
                 .header("Accept-Encoding", "gzip")
                 .header("User-Agent", HTTP_USER_AGENT)
@@ -200,14 +200,14 @@ public class Blankningsregistret {
                 .build();
 
         try {
-            var resp = httpClient.send(req, HttpResponse.BodyHandlers.ofInputStream());
+            var response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
-            if (resp.statusCode() == 404)
+            if (response.statusCode() == 404)
                 throw new IOException("404 - Not Found");
 
-            var inputStream = resp.body();
+            var inputStream = response.body();
 
-            if (Optional.of("gzip").equals(resp.headers().firstValue("Content-Encoding")))
+            if (Optional.of("gzip").equals(response.headers().firstValue("Content-Encoding")))
                 inputStream = new GZIPInputStream(inputStream);
 
             return new BufferedInputStream(inputStream);

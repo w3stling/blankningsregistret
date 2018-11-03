@@ -188,7 +188,7 @@ public class ExcelFileReader {
             // Do now, as characters() may be called more than once
             if (nextIsString) {
                 int idx = Integer.parseInt(lastContentsBuilder.toString().trim());
-                XSSFRichTextString text = new XSSFRichTextString(sst.getEntryAt(idx));
+                XSSFRichTextString text = new XSSFRichTextString(sst.getItemAt(idx).getString());
                 lastContentsBuilder.setLength(0);
                 lastContentsBuilder.append(text.toString());
                 nextIsString = false;
