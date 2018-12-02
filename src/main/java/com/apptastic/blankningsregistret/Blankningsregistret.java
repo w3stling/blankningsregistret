@@ -24,6 +24,7 @@
 package com.apptastic.blankningsregistret;
 
 import com.apptastic.blankningsregistret.internal.ExcelFileReader;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -71,6 +72,7 @@ public class Blankningsregistret {
      * Default constructor.
      */
     public Blankningsregistret() {
+        ZipSecureFile.setMinInflateRatio(0.0079);
         httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(15))
                 .build();
