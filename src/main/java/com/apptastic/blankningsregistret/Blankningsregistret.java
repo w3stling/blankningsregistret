@@ -72,7 +72,7 @@ public class Blankningsregistret {
      * Default constructor.
      */
     public Blankningsregistret() {
-        ZipSecureFile.setMinInflateRatio(0.0079);
+        ZipSecureFile.setMinInflateRatio(0.0070);
         httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(15))
                 .build();
