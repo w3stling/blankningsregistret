@@ -48,7 +48,6 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
     /**
      * Constructor
      *
-     * @param publicationDate publication date
      * @param positionHolder position holder name
      * @param issuer issuer name
      * @param isin ISIN number
@@ -56,8 +55,8 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
      * @param positionDate position date
      * @param comment comment
      */
-    public NetShortPosition(String publicationDate, String positionHolder, String issuer, String isin,
-                            double positionInPercent, String positionDate, String comment) {
+    public NetShortPosition(String positionHolder, String issuer, String isin, double positionInPercent,
+                            String positionDate, String comment) {
 
         this.positionHolder = positionHolder;
         this.issuer = issuer;

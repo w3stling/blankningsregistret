@@ -175,7 +175,7 @@ public class Blankningsregistret {
             return null;
         }
 
-        return new NetShortPosition(null, row[INDEX_POSITION_HOLDER].trim(), row[INDEX_ISSUER].trim(), row[INDEX_ISIN].trim(), position, positionDate, comment);
+        return new NetShortPosition(row[INDEX_POSITION_HOLDER].trim(), row[INDEX_ISSUER].trim(), row[INDEX_ISIN].trim(), position, positionDate, comment);
     }
 
     private double toPosition(String text) {

@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 public class NetShortPositionTest {
 
     private NetShortPosition defaultNetShortPosition() {
-        return new NetShortPosition("2018-05-11", "JPMorgan Asset Management (UK) Ltd", "RaySearch Laboratories AB",
+        return new NetShortPosition("JPMorgan Asset Management (UK) Ltd", "RaySearch Laboratories AB",
                 "SE0000135485", 0.43, "2018-05-09", "Fallit under 0,5%");
     }
 
