@@ -44,6 +44,9 @@ import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.TimeZone;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -107,10 +110,7 @@ public class Blankningsregistret {
         for (var i = 0; i < maxPreviousDays + 1; ++i) {
             try {
                 var searchDateString = dateFormat.format(searchDate.getTime());
-                var active = getStream(URL_ACTIVE_FORMAT, searchDateString);
-                var historical = getStream(URL_HISTORICAL_FORMAT, searchDateString);
-
-                return Stream.concat(active, historical).sorted(Comparator.comparing(NetShortPosition::getPositionDate).reversed());
+                return getStream(searchDateString);
             }
             catch (IOException e) {
                 var logger = Logger.getLogger("com.apptastic.blankningsregistret");
@@ -125,10 +125,28 @@ public class Blankningsregistret {
         return Stream.empty();
     }
 
-    private Stream<NetShortPosition> getStream(String urlFormat, String searchDateString) throws IOException {
-        var url = String.format(urlFormat, searchDateString);
-        var is = sendRequest(url);
+    private Stream<NetShortPosition> getStream(String searchDateString) throws IOException {
+        var urlHistorical = String.format(URL_HISTORICAL_FORMAT, searchDateString);
+        var resultHistorical = sendAsyncRequest(urlHistorical).thenApply(processResponse());
 
+        var urlActive = String.format(URL_ACTIVE_FORMAT, searchDateString);
+        var resultActive = sendAsyncRequest(urlActive).thenApply(processResponse());
+
+        try {
+            return Stream.concat(resultActive.join(), resultHistorical.join())
+                         .sorted(Comparator.comparing(NetShortPosition::getPositionDate).reversed());
+        } catch (CompletionException e) {
+            try {
+                throw e.getCause();
+            } catch (IOException e2) {
+                throw e2;
+            } catch(Throwable e2) {
+                throw new AssertionError(e2);
+            }
+        }
+    }
+
+    private Stream<NetShortPosition> parsResponse(InputStream is) {
         if (is != null) {
             var reader = new ExcelFileReader(is);
             var rowIterator = reader.getIterator();
@@ -151,7 +169,6 @@ public class Blankningsregistret {
 
         return dateFormat.format(epoch.getTime());
     }
-
 
     private NetShortPosition createNetShortPosition(String[] row) {
         if (row[0].length() == 43 && row[0].startsWith("Innehavare"))
@@ -187,13 +204,7 @@ public class Blankningsregistret {
         return Double.parseDouble(text.replace(',', '.'));
     }
 
-    /**
-     * Internal method for sending the http request.
-     * @param url URL to send the request
-     * @return The response for the request
-     * @throws IOException exception
-     */
-    protected InputStream sendRequest(String url) throws IOException {
+    private CompletableFuture<HttpResponse<InputStream>> sendAsyncRequest(String url) {
         var request = HttpRequest.newBuilder(URI.create(url))
                 .timeout(Duration.ofSeconds(15))
                 .header("Accept-Encoding", "gzip")
@@ -201,22 +212,26 @@ public class Blankningsregistret {
                 .GET()
                 .build();
 
-        try {
-            var response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream());
+    }
 
-            if (response.statusCode() == 404)
-                throw new IOException("404 - Not Found");
+    private Function<HttpResponse<InputStream>, Stream<NetShortPosition>> processResponse() {
+        return response -> {
+            try {
+                if (response.statusCode() == 404)
+                    throw new IOException("404 - Not Found");
 
-            var inputStream = response.body();
+                var inputStream = response.body();
 
-            if (Optional.of("gzip").equals(response.headers().firstValue("Content-Encoding")))
-                inputStream = new GZIPInputStream(inputStream);
+                if (Optional.of("gzip").equals(response.headers().firstValue("Content-Encoding")))
+                    inputStream = new GZIPInputStream(inputStream);
 
-            return new BufferedInputStream(inputStream);
-        }
-        catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IOException(e);
-        }
+                inputStream = new BufferedInputStream(inputStream);
+                return parsResponse(inputStream);
+
+            } catch (IOException e) {
+                throw new CompletionException(e);
+            }
+        };
     }
 }
