@@ -177,11 +177,13 @@ public class Blankningsregistret {
         var comment = (row.length == 6) ? row[INDEX_COMMENT].trim() : null;
         comment = (comment == null || comment.isEmpty()) ? null : comment;
         double position;
+        boolean significantPosition;
         String positionDate;
 
         try {
             positionDate = toDate(row[INDEX_POSITION_DATE].trim());
             position = toPosition(row[INDEX_POSITION]);
+            significantPosition = toSignificantPosition(row[INDEX_POSITION]);
         }
         catch (NumberFormatException e) {
             Logger logger = Logger.getLogger("com.apptastic.blankningsregistret");
@@ -192,7 +194,7 @@ public class Blankningsregistret {
             return null;
         }
 
-        return new NetShortPosition(row[INDEX_POSITION_HOLDER].trim(), row[INDEX_ISSUER].trim(), row[INDEX_ISIN].trim(), position, positionDate, comment);
+        return new NetShortPosition(row[INDEX_POSITION_HOLDER].trim(), row[INDEX_ISSUER].trim(), row[INDEX_ISIN].trim(), position, positionDate, comment, significantPosition);
     }
 
     private double toPosition(String text) {
@@ -202,6 +204,10 @@ public class Blankningsregistret {
             text = text.substring(1);
 
         return Double.parseDouble(text.replace(',', '.'));
+    }
+
+    private boolean toSignificantPosition(String text) {
+        return text.trim().charAt(0) != '<';
     }
 
     private CompletableFuture<HttpResponse<InputStream>> sendAsyncRequest(String url) {

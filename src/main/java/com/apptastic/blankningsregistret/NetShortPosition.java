@@ -37,6 +37,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
     private double positionInPercent;
     private String positionDate;
     private String comment;
+    private boolean significantPosition;
 
     /**
      * Default constructor
@@ -56,7 +57,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
      * @param comment comment
      */
     public NetShortPosition(String positionHolder, String issuer, String isin, double positionInPercent,
-                            String positionDate, String comment) {
+                            String positionDate, String comment, boolean significantPosition) {
 
         this.positionHolder = positionHolder;
         this.issuer = issuer;
@@ -64,6 +65,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
         this.positionInPercent = positionInPercent;
         this.positionDate = positionDate;
         this.comment = comment;
+        this.significantPosition = significantPosition;
     }
 
     /**
@@ -174,6 +176,22 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
      */
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    /**
+     * Set whether the net short position is significant
+     * @param significantPosition significant position
+     */
+    public void setSignificantPosition(boolean significantPosition) {
+        this.significantPosition = significantPosition;
+    }
+
+    /**
+     * Is net short position significant
+     * @return true if position is significant otherwise false
+     */
+    public boolean isSignificantPosition() {
+        return significantPosition;
     }
 
     @Override
