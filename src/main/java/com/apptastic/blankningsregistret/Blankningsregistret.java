@@ -126,6 +126,7 @@ public class Blankningsregistret {
         return Stream.empty();
     }
 
+    @SuppressWarnings("squid:S1181")
     private Stream<NetShortPosition> getStream(String searchDateString) throws IOException {
         var urlHistorical = String.format(URL_HISTORICAL_FORMAT, searchDateString);
         var resultHistorical = sendAsyncRequest(urlHistorical).thenApply(processResponse());
