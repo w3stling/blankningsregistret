@@ -61,7 +61,6 @@ public class Blankningsregistret {
     private static final String URL_ACTIVE_FORMAT = "https://www.fi.se/contentassets/71a61417bb4c49c0a4a3a2582ea8af6c/aktuella_positioner_%1$s.xlsx";
     private static final String URL_HISTORICAL_FORMAT = "https://www.fi.se/contentassets/71a61417bb4c49c0a4a3a2582ea8af6c/historiska_positioner_%1$s.xlsx";
     private static final String HTTP_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
-    private static final double SIGNIFICANT_POSITION = 0.5;
     private static final int INDEX_POSITION_HOLDER = 0;
     private static final int INDEX_ISSUER = 1;
     private static final int INDEX_ISIN = 2;

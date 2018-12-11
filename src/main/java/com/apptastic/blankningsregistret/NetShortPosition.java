@@ -31,6 +31,7 @@ import java.util.Optional;
  * Class represent the net short position.
  */
 public class NetShortPosition implements Comparable<NetShortPosition> {
+    private static final double SIGNIFICANT_POSITION = 0.5;
     private String positionHolder;
     private String issuer;
     private String isin;
@@ -181,7 +182,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
      * @return true if position is significant otherwise false
      */
     public boolean isSignificantPosition() {
-        return positionInPercent > 0.5;
+        return positionInPercent > SIGNIFICANT_POSITION;
     }
 
     @Override
