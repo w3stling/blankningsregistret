@@ -16,7 +16,7 @@ Blankningsregistret
 the [Finansinspektionen][2] (FI). It contains information short selling.
 
 FI will on a daily basis, normally shortly after 15:30 o'clock, publish significant
-net short positions in shares (>0.5 per cent) in the document below.
+net short positions in shares (>0.5 percent) in the document below.
 
 This Java library makes it easier to automate data extraction from Blankningsregistret.
 
