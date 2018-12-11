@@ -86,7 +86,7 @@ public class Blankningsregistret {
      * Searches for published net search positions from today's date.
      *
      * If the positions has not been yet been published for today then try the previous day.
-     * Maximum 30 day back from today's date.
+     * Maximum 30 day back from today's date if no position is found for that date.
      * @return stream of net short positions
      */
     public Stream<NetShortPosition> search() {
@@ -100,7 +100,7 @@ public class Blankningsregistret {
      * If the positions has not yet been been published for the given date then try the previous day
      * up until the given max number of previous days.
      * @param date date to search from
-     * @param maxPreviousDays search max previous days back from the given date
+     * @param maxPreviousDays search max previous days back from the given date if no position for the given date if found.
      * @return stream of net short positions
      */
     public Stream<NetShortPosition> search(Date date, int maxPreviousDays) {
