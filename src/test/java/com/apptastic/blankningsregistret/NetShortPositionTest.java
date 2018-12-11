@@ -34,7 +34,7 @@ public class NetShortPositionTest {
 
     private NetShortPosition defaultNetShortPosition() {
         return new NetShortPosition("JPMorgan Asset Management (UK) Ltd", "RaySearch Laboratories AB",
-                "SE0000135485", 0.43, "2018-05-09", "Fallit under 0,5%", false);
+                "SE0000135485", 0.43, "2018-05-09", "Fallit under 0,5%");
     }
 
     @Test
@@ -78,11 +78,6 @@ public class NetShortPositionTest {
             NetShortPosition position2 = defaultNetShortPosition();
             position2.setComment("");
             assertNotEquals(position1, position2);
-        }
-        {
-            NetShortPosition position2 = defaultNetShortPosition();
-            position2.setSignificantPosition(true);
-            assertTrue(position2.isSignificantPosition());
         }
     }
 
