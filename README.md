@@ -72,8 +72,8 @@ Add repository for resolving artifact:
     ...
     <repositories>
         <repository>
-            <id>apptastic-maven-repo</id>
-            <url>https://dl.bintray.com/apptastic/maven-repo</url>
+            <id>jcenter</id>
+            <url>https://jcenter.bintray.com</url>
         </repository>
     </repositories>
     ...
@@ -99,9 +99,7 @@ Add dependency declaration:
 Add repository for resolving artifact:
 ```groovy
 repositories {
-    maven {
-        url  "https://dl.bintray.com/apptastic/maven-repo" 
-    }
+    jcenter()
 }
 ```
 
