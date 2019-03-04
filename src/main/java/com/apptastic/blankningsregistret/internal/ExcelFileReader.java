@@ -80,6 +80,11 @@ public class ExcelFileReader {
                 BufferedInputStream bisSheet = new BufferedInputStream(sheetInputStream);
                 InputSource sheetSource = new InputSource(bisSheet);
                 XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+
+                // disable external entities
+                inputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
+                inputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
+
                 eventReader = inputFactory.createXMLEventReader(sheetSource.getByteStream());
             }
             catch (Exception e) {
