@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"m":"com.apptastic.blankningsregistret","l":"com.apptastic.blankningsregistret"},{"m":"com.apptastic.blankningsregistret","l":"com.apptastic.blankningsregistret.internal"}]
