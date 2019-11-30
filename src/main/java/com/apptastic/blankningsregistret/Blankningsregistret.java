@@ -40,14 +40,12 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Function;
@@ -107,8 +105,8 @@ public class Blankningsregistret {
      * @return stream of net short positions
      */
     public Stream<NetShortPosition> search() {
-        var searchDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/Stockholm"));
-        return search(searchDate.getTime(), 30);
+        var searchDate = LocalDate.now(ZoneId.of("Europe/Stockholm"));
+        return search(searchDate, 30);
     }
 
     /**
@@ -119,10 +117,32 @@ public class Blankningsregistret {
      * @param date date to search from
      * @param maxPreviousDays search max previous days back from the given date if no position for the given date if found.
      * @return stream of net short positions
+     *
+     * @deprecated Use LocalDate class instead of Date class
      */
+    @Deprecated
     public Stream<NetShortPosition> search(Date date, int maxPreviousDays) {
         LocalDate searchDate = LocalDate.ofInstant(date.toInstant(), ZoneId.of("Europe/Stockholm"));
 
+        for (var i = 0; i < maxPreviousDays + 1; ++i) {
+            try {
+                var searchDateString = dateFormat.format(searchDate);
+                return getStream(searchDateString);
+            }
+            catch (IOException e) {
+                var logger = Logger.getLogger("com.apptastic.blankningsregistret");
+
+                if (logger.isLoggable(Level.FINER))
+                    logger.log(Level.FINER, "Failed to parse file. ", e);
+            }
+
+            searchDate = searchDate.minusDays(1);
+        }
+
+        return Stream.empty();
+    }
+
+    public Stream<NetShortPosition> search(LocalDate searchDate, int maxPreviousDays) {
         for (var i = 0; i < maxPreviousDays + 1; ++i) {
             try {
                 var searchDateString = dateFormat.format(searchDate);

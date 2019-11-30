@@ -25,6 +25,8 @@ package com.apptastic.blankningsregistret;
 
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -69,13 +71,24 @@ public class BlankningsregistretTest {
     }
 
     @Test
-    public void searchNotYetPublished() {
+    public void searchNotYetPublishedOld() {
         Calendar searchDateTomorrow = Calendar.getInstance(TimeZone.getTimeZone("Europe/Stockholm"));
         searchDateTomorrow.add(Calendar.DAY_OF_YEAR, 1);
 
         Blankningsregistret br = new Blankningsregistret();
 
         List<NetShortPosition> positions = br.search(searchDateTomorrow.getTime(), 0).collect(toList());
+        assertEquals(0, positions.size());
+    }
+
+    @Test
+    public void searchNotYetPublished() {
+        LocalDate searchDateTomorrow = LocalDate.now(ZoneId.of("Europe/Stockholm"));
+        searchDateTomorrow = searchDateTomorrow.plusDays(1);
+
+        Blankningsregistret br = new Blankningsregistret();
+
+        List<NetShortPosition> positions = br.search(searchDateTomorrow, 0).collect(toList());
         assertEquals(0, positions.size());
     }
 }
