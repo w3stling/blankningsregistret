@@ -120,6 +120,7 @@ public class Blankningsregistret {
      *
      * @deprecated Use LocalDate class instead of Date class
      */
+    @SuppressWarnings("squid:S1133")
     @Deprecated(since="2.1.0")
     public Stream<NetShortPosition> search(Date date, int maxPreviousDays) {
         LocalDate searchDate = LocalDate.ofInstant(date.toInstant(), ZoneId.of("Europe/Stockholm"));
@@ -130,7 +131,7 @@ public class Blankningsregistret {
                 return getStream(searchDateString);
             }
             catch (IOException e) {
-                var logger = Logger.getLogger("com.apptastic.blankningsregistret");
+                var logger = Logger.getLogger(Blankningsregistret.class.getName());
 
                 if (logger.isLoggable(Level.FINER))
                     logger.log(Level.FINER, "Failed to parse file. ", e);
@@ -149,7 +150,7 @@ public class Blankningsregistret {
                 return getStream(searchDateString);
             }
             catch (IOException e) {
-                var logger = Logger.getLogger("com.apptastic.blankningsregistret");
+                var logger = Logger.getLogger(Blankningsregistret.class.getName());
 
                 if (logger.isLoggable(Level.FINER))
                     logger.log(Level.FINER, "Failed to parse file. ", e);
@@ -202,7 +203,7 @@ public class Blankningsregistret {
             return date;
 
         LocalDate epoch = LocalDate.of(1899, 11, 30);
-        epoch = epoch.plusDays(Integer.valueOf(date));
+        epoch = epoch.plusDays(Integer.parseInt(date));
 
         return dateFormat.format(epoch);
     }
@@ -221,7 +222,7 @@ public class Blankningsregistret {
             position = toPosition(row[INDEX_POSITION]);
         }
         catch (NumberFormatException e) {
-            Logger logger = Logger.getLogger("com.apptastic.blankningsregistret");
+            Logger logger = Logger.getLogger(Blankningsregistret.class.getName());
 
             if (logger.isLoggable(Level.WARNING))
                 logger.log(Level.WARNING, "Failed to parse net short position. ", e);
