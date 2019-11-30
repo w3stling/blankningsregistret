@@ -32,4 +32,5 @@ module com.apptastic.blankningsregistret {
     requires java.xml;
     requires java.net.http;
     requires poi.ooxml;
+    requires poi;
 }

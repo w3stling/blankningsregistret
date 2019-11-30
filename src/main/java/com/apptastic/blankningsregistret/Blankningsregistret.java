@@ -26,6 +26,7 @@ package com.apptastic.blankningsregistret;
 import com.apptastic.blankningsregistret.internal.ExcelFileReader;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 
+import javax.net.ssl.SSLContext;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,12 +34,15 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.text.SimpleDateFormat;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
@@ -67,8 +71,8 @@ public class Blankningsregistret {
     private static final int INDEX_POSITION = 3;
     private static final int INDEX_POSITION_DATE = 4;
     private static final int INDEX_COMMENT = 5;
-    private final HttpClient httpClient;
-    private SimpleDateFormat dateFormat;
+    private HttpClient httpClient;
+    private DateTimeFormatter dateFormat;
 
 
     /**
@@ -76,10 +80,23 @@ public class Blankningsregistret {
      */
     public Blankningsregistret() {
         ZipSecureFile.setMinInflateRatio(0.0070);
-        httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(15))
-                .build();
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            SSLContext context = SSLContext.getInstance("TLSv1.3");
+            context.init(null, null, null);
+
+            httpClient = HttpClient.newBuilder()
+                    .sslContext(context)
+                    .connectTimeout(Duration.ofSeconds(15))
+                    .followRedirects(HttpClient.Redirect.NORMAL)
+                    .build();
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            httpClient = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(15))
+                    .followRedirects(HttpClient.Redirect.NORMAL)
+                    .build();
+        }
+
+        dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
     /**
@@ -104,12 +121,11 @@ public class Blankningsregistret {
      * @return stream of net short positions
      */
     public Stream<NetShortPosition> search(Date date, int maxPreviousDays) {
-        var searchDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/Stockholm"));
-        searchDate.setTime(date);
+        LocalDate searchDate = LocalDate.ofInstant(date.toInstant(), ZoneId.of("Europe/Stockholm"));
 
         for (var i = 0; i < maxPreviousDays + 1; ++i) {
             try {
-                var searchDateString = dateFormat.format(searchDate.getTime());
+                var searchDateString = dateFormat.format(searchDate);
                 return getStream(searchDateString);
             }
             catch (IOException e) {
@@ -119,7 +135,7 @@ public class Blankningsregistret {
                     logger.log(Level.FINER, "Failed to parse file. ", e);
             }
 
-            searchDate.add(Calendar.DAY_OF_YEAR, -1);
+            searchDate = searchDate.minusDays(1);
         }
 
         return Stream.empty();
@@ -165,10 +181,10 @@ public class Blankningsregistret {
         if (date.length() == 10)
             return date;
 
-        var epoch = new GregorianCalendar(1899,11,30);
-        epoch.add(Calendar.DAY_OF_YEAR, Integer.valueOf(date));
+        LocalDate epoch = LocalDate.of(1899, 11, 30);
+        epoch = epoch.plusDays(Integer.valueOf(date));
 
-        return dateFormat.format(epoch.getTime());
+        return dateFormat.format(epoch);
     }
 
     private NetShortPosition createNetShortPosition(String[] row) {
