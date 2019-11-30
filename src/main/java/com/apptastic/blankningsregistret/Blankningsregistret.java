@@ -124,23 +124,7 @@ public class Blankningsregistret {
     @Deprecated(since="2.1.0")
     public Stream<NetShortPosition> search(Date date, int maxPreviousDays) {
         LocalDate searchDate = LocalDate.ofInstant(date.toInstant(), ZoneId.of("Europe/Stockholm"));
-
-        for (var i = 0; i < maxPreviousDays + 1; ++i) {
-            try {
-                var searchDateString = dateFormat.format(searchDate);
-                return getStream(searchDateString);
-            }
-            catch (IOException e) {
-                var logger = Logger.getLogger(Blankningsregistret.class.getName());
-
-                if (logger.isLoggable(Level.FINER))
-                    logger.log(Level.FINER, "Failed to parse file. ", e);
-            }
-
-            searchDate = searchDate.minusDays(1);
-        }
-
-        return Stream.empty();
+        return search(searchDate, maxPreviousDays);
     }
 
     public Stream<NetShortPosition> search(LocalDate searchDate, int maxPreviousDays) {

@@ -88,7 +88,7 @@ public class ExcelFileReader {
                 eventReader = inputFactory.createXMLEventReader(sheetSource.getByteStream());
             }
             catch (Exception e) {
-                Logger logger = Logger.getLogger("com.apptastic.blankningsregistret");
+                Logger logger = Logger.getLogger(ExcelFileReader.class.getName());
 
                 if (logger.isLoggable(Level.WARNING))
                     logger.log(Level.WARNING, "Failed to parse file. ", e);
