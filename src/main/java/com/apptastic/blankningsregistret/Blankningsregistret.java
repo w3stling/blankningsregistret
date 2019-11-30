@@ -120,7 +120,7 @@ public class Blankningsregistret {
      *
      * @deprecated Use LocalDate class instead of Date class
      */
-    @Deprecated
+    @Deprecated(since="2.1.0")
     public Stream<NetShortPosition> search(Date date, int maxPreviousDays) {
         LocalDate searchDate = LocalDate.ofInstant(date.toInstant(), ZoneId.of("Europe/Stockholm"));
 
