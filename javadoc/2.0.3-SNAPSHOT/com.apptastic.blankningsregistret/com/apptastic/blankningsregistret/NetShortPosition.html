@@ -172,11 +172,11 @@ implements java.lang.Comparable&lt;<a href="NetShortPosition.html" title="class 
 </td>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,double,java.lang.String,java.lang.String)">NetShortPosition</a></span>&#8203;(java.lang.String&nbsp;positionHolder,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,double,java.time.LocalDate,java.lang.String)">NetShortPosition</a></span>&#8203;(java.lang.String&nbsp;positionHolder,
                 java.lang.String&nbsp;issuer,
                 java.lang.String&nbsp;isin,
                 double&nbsp;positionInPercent,
-                java.lang.String&nbsp;positionDate,
+                java.time.LocalDate&nbsp;positionDate,
                 java.lang.String&nbsp;comment)</code></th>
 <td class="colLast">
 <div class="block">Constructor</div>
@@ -232,7 +232,7 @@ implements java.lang.Comparable&lt;<a href="NetShortPosition.html" title="class 
 </td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colFirst"><code>java.time.LocalDate</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPositionDate()">getPositionDate</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get date for this position in format YYYY-DD-MM.</div>
@@ -287,7 +287,7 @@ implements java.lang.Comparable&lt;<a href="NetShortPosition.html" title="class 
 </tr>
 <tr id="i13" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setPositionDate(java.lang.String)">setPositionDate</a></span>&#8203;(java.lang.String&nbsp;positionDate)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setPositionDate(java.time.LocalDate)">setPositionDate</a></span>&#8203;(java.time.LocalDate&nbsp;positionDate)</code></th>
 <td class="colLast">
 <div class="block">Set date for this position in format YYYY-DD-MM.</div>
 </td>
@@ -340,7 +340,7 @@ implements java.lang.Comparable&lt;<a href="NetShortPosition.html" title="class 
 <div class="block">Default constructor</div>
 </li>
 </ul>
-<a id="&lt;init&gt;(java.lang.String,java.lang.String,java.lang.String,double,java.lang.String,java.lang.String)">
+<a id="&lt;init&gt;(java.lang.String,java.lang.String,java.lang.String,double,java.time.LocalDate,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -350,7 +350,7 @@ implements java.lang.Comparable&lt;<a href="NetShortPosition.html" title="class 
                         java.lang.String&nbsp;issuer,
                         java.lang.String&nbsp;isin,
                         double&nbsp;positionInPercent,
-                        java.lang.String&nbsp;positionDate,
+                        java.time.LocalDate&nbsp;positionDate,
                         java.lang.String&nbsp;comment)</pre>
 <div class="block">Constructor</div>
 <dl>
@@ -506,7 +506,7 @@ implements java.lang.Comparable&lt;<a href="NetShortPosition.html" title="class 
 <ul class="blockList">
 <li class="blockList">
 <h4>getPositionDate</h4>
-<pre class="methodSignature">public&nbsp;java.lang.String&nbsp;getPositionDate()</pre>
+<pre class="methodSignature">public&nbsp;java.time.LocalDate&nbsp;getPositionDate()</pre>
 <div class="block">Get date for this position in format YYYY-DD-MM.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -514,13 +514,13 @@ implements java.lang.Comparable&lt;<a href="NetShortPosition.html" title="class 
 </dl>
 </li>
 </ul>
-<a id="setPositionDate(java.lang.String)">
+<a id="setPositionDate(java.time.LocalDate)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setPositionDate</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;setPositionDate&#8203;(java.lang.String&nbsp;positionDate)</pre>
+<pre class="methodSignature">public&nbsp;void&nbsp;setPositionDate&#8203;(java.time.LocalDate&nbsp;positionDate)</pre>
 <div class="block">Set date for this position in format YYYY-DD-MM.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
