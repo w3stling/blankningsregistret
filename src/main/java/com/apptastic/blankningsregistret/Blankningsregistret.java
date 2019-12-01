@@ -182,14 +182,14 @@ public class Blankningsregistret {
         return Stream.empty();
     }
 
-    private String toDate(String date) {
+    private LocalDate toLocalDate(String date) {
         if (date.length() == 10)
-            return date;
+            return LocalDate.parse(date, dateFormat);
 
         LocalDate epoch = LocalDate.of(1899, 11, 30);
         epoch = epoch.plusDays(Integer.parseInt(date));
 
-        return dateFormat.format(epoch);
+        return epoch;
     }
 
     private NetShortPosition createNetShortPosition(String[] row) {
@@ -199,10 +199,10 @@ public class Blankningsregistret {
         var comment = (row.length == 6) ? row[INDEX_COMMENT].trim() : null;
         comment = (comment == null || comment.isEmpty()) ? null : comment;
         double position;
-        String positionDate;
+        LocalDate positionDate;
 
         try {
-            positionDate = toDate(row[INDEX_POSITION_DATE].trim());
+            positionDate = toLocalDate(row[INDEX_POSITION_DATE].trim());
             position = toPosition(row[INDEX_POSITION]);
         }
         catch (NumberFormatException e) {

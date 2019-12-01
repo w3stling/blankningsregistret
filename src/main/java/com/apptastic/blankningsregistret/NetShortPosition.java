@@ -23,6 +23,7 @@
  */
 package com.apptastic.blankningsregistret;
 
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -36,7 +37,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
     private String issuer;
     private String isin;
     private double positionInPercent;
-    private String positionDate;
+    private LocalDate positionDate;
     private String comment;
 
     /**
@@ -57,7 +58,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
      * @param comment comment
      */
     public NetShortPosition(String positionHolder, String issuer, String isin, double positionInPercent,
-                            String positionDate, String comment) {
+                            LocalDate positionDate, String comment) {
 
         this.positionHolder = positionHolder;
         this.issuer = issuer;
@@ -149,7 +150,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
      * Get date for this position in format YYYY-DD-MM.
      * @return date
      */
-    public String getPositionDate() {
+    public LocalDate getPositionDate() {
         return positionDate;
     }
 
@@ -157,7 +158,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
      * Set date for this position in format YYYY-DD-MM.
      * @param positionDate date
      */
-    public void setPositionDate(String positionDate) {
+    public void setPositionDate(LocalDate positionDate) {
         this.positionDate = positionDate;
     }
 

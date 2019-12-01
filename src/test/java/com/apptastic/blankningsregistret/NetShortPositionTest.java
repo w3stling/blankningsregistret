@@ -25,6 +25,7 @@ package com.apptastic.blankningsregistret;
 
 import org.junit.Test;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -34,7 +35,7 @@ public class NetShortPositionTest {
 
     private NetShortPosition defaultNetShortPosition() {
         return new NetShortPosition("JPMorgan Asset Management (UK) Ltd", "RaySearch Laboratories AB",
-                "SE0000135485", 0.43, "2018-05-09", "Fallit under 0,5%");
+                "SE0000135485", 0.43, LocalDate.of(2018, 5, 9), "Fallit under 0,5%");
     }
 
     @Test
@@ -75,7 +76,7 @@ public class NetShortPositionTest {
         }
         {
             NetShortPosition position2 = defaultNetShortPosition();
-            position2.setPositionDate("2018-05-10");
+            position2.setPositionDate( LocalDate.of(2018, 5, 10));
             assertNotEquals(position1, position2);
         }
         {
@@ -88,20 +89,20 @@ public class NetShortPositionTest {
     @Test
     public void testSort() {
         NetShortPosition position1 = defaultNetShortPosition();
-        position1.setPositionDate("2018-05-10");
+        position1.setPositionDate(LocalDate.of(2018, 5, 10));
 
         NetShortPosition position2 = defaultNetShortPosition();
-        position2.setPositionDate("2018-05-09");
+        position2.setPositionDate( LocalDate.of(2018, 5, 9));
 
         NetShortPosition position3 = defaultNetShortPosition();
-        position3.setPositionDate("2018-05-11");
+        position3.setPositionDate( LocalDate.of(2018, 5, 11));
 
         List<NetShortPosition> positions = Arrays.asList(position1, position2, position3);
         Collections.sort(positions);
 
-        assertEquals("2018-05-09", positions.get(0).getPositionDate());
-        assertEquals("2018-05-10", positions.get(1).getPositionDate());
-        assertEquals("2018-05-11", positions.get(2).getPositionDate());
+        assertEquals("2018-05-09", positions.get(0).getPositionDate().toString());
+        assertEquals("2018-05-10", positions.get(1).getPositionDate().toString());
+        assertEquals("2018-05-11", positions.get(2).getPositionDate().toString());
     }
 
     @Test
@@ -109,15 +110,15 @@ public class NetShortPositionTest {
         Map<NetShortPosition, String> transactions = new HashMap<>();
 
         NetShortPosition position1 = defaultNetShortPosition();
-        position1.setPositionDate("2018-05-09");
+        position1.setPositionDate(LocalDate.of(2018, 5, 9));
         transactions.put(position1, "Position1");
 
         NetShortPosition position2 = defaultNetShortPosition();
-        position2.setPositionDate("2018-05-10");
+        position2.setPositionDate(LocalDate.of(2018, 05, 10));
         transactions.put(position2, "Position2");
 
         NetShortPosition position3 = defaultNetShortPosition();
-        position3.setPositionDate("2018-05-11");
+        position3.setPositionDate(LocalDate.of(2018, 05, 11));
         transactions.put(position3, "Position3");
 
         assertEquals("Position1", transactions.get(position1));
@@ -130,15 +131,15 @@ public class NetShortPositionTest {
         Map<NetShortPosition, String> transactions = new TreeMap<>();
 
         NetShortPosition position1 = defaultNetShortPosition();
-        position1.setPositionDate("2018-05-09");
+        position1.setPositionDate(LocalDate.of(2018, 5, 9));
         transactions.put(position1, "Position1");
 
         NetShortPosition position2 = defaultNetShortPosition();
-        position2.setPositionDate("2018-05-10");
+        position2.setPositionDate(LocalDate.of(2018, 5, 10));
         transactions.put(position2, "Position2");
 
         NetShortPosition position3 = defaultNetShortPosition();
-        position3.setPositionDate("2018-05-11");
+        position3.setPositionDate( LocalDate.of(2018, 5, 11));
         transactions.put(position3, "Position3");
 
         assertEquals("Position1", transactions.get(position1));
@@ -149,9 +150,9 @@ public class NetShortPositionTest {
     @Test
     public void basic() {
         NetShortPosition position = new NetShortPosition();
-        position.setPositionDate("2018-05-11");
+        position.setPositionDate(LocalDate.of(2018, 5, 11));
 
-        assertEquals("2018-05-11", position.getPositionDate());
+        assertEquals("2018-05-11", position.getPositionDate().toString());
     }
 
 
