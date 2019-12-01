@@ -127,10 +127,19 @@ public class Blankningsregistret {
         return search(searchDate, maxPreviousDays);
     }
 
-    public Stream<NetShortPosition> search(LocalDate searchDate, int maxPreviousDays) {
+    /**
+     * Searches for published net search positions from the given date.
+     *
+     * If the positions has not yet been been published for the given date then try the previous day
+     * up until the given max number of previous days.
+     * @param date date to search from
+     * @param maxPreviousDays search max previous days back from the given date if no position for the given date if found.
+     * @return stream of net short positions
+     */
+    public Stream<NetShortPosition> search(LocalDate date, int maxPreviousDays) {
         for (var i = 0; i < maxPreviousDays + 1; ++i) {
             try {
-                var searchDateString = dateFormat.format(searchDate);
+                var searchDateString = dateFormat.format(date);
                 return getStream(searchDateString);
             }
             catch (IOException e) {
@@ -140,7 +149,7 @@ public class Blankningsregistret {
                     logger.log(Level.FINER, "Failed to parse file. ", e);
             }
 
-            searchDate = searchDate.minusDays(1);
+            date = date.minusDays(1);
         }
 
         return Stream.empty();
