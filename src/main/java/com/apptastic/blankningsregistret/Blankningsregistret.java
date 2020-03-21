@@ -69,7 +69,6 @@ public class Blankningsregistret {
     private static final int INDEX_POSITION = 3;
     private static final int INDEX_POSITION_DATE = 4;
     private static final int INDEX_COMMENT = 5;
-    private HttpClient httpClient;
     private DateTimeFormatter dateFormat;
 
 
@@ -78,22 +77,6 @@ public class Blankningsregistret {
      */
     public Blankningsregistret() {
         ZipSecureFile.setMinInflateRatio(0.0070);
-        try {
-            SSLContext context = SSLContext.getInstance("TLSv1.3");
-            context.init(null, null, null);
-
-            httpClient = HttpClient.newBuilder()
-                    .sslContext(context)
-                    .connectTimeout(Duration.ofSeconds(15))
-                    .followRedirects(HttpClient.Redirect.NORMAL)
-                    .build();
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            httpClient = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(15))
-                    .followRedirects(HttpClient.Redirect.NORMAL)
-                    .build();
-        }
-
         dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
@@ -243,6 +226,7 @@ public class Blankningsregistret {
                 .GET()
                 .build();
 
+        var httpClient = createHttpClient();
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream());
     }
 
@@ -264,5 +248,27 @@ public class Blankningsregistret {
                 throw new CompletionException(e);
             }
         };
+    }
+
+    private HttpClient createHttpClient() {
+        HttpClient httpClient;
+
+        try {
+            SSLContext context = SSLContext.getInstance("TLSv1.3");
+            context.init(null, null, null);
+
+            httpClient = HttpClient.newBuilder()
+                    .sslContext(context)
+                    .connectTimeout(Duration.ofSeconds(15))
+                    .followRedirects(HttpClient.Redirect.NORMAL)
+                    .build();
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            httpClient = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(15))
+                    .followRedirects(HttpClient.Redirect.NORMAL)
+                    .build();
+        }
+
+        return httpClient;
     }
 }
