@@ -206,7 +206,24 @@ public class Blankningsregistret {
             return null;
         }
 
-        return new NetShortPosition(row[INDEX_POSITION_HOLDER].trim(), row[INDEX_ISSUER].trim(), row[INDEX_ISIN].trim(), position, positionDate, comment);
+        String positionHolder = toText(row[INDEX_POSITION_HOLDER]);
+        String issuer = toText(row[INDEX_ISSUER]);
+        String isin = toText(row[INDEX_ISIN]);
+        comment = toText(comment);
+
+        return new NetShortPosition(positionHolder, issuer, isin, position, positionDate, comment);
+    }
+
+    private static String toText(String text) {
+        if (text == null) {
+            return null;
+        }
+
+        if (text.length() > 0 && text.charAt(text.length() -1) == 160) {
+            text = text.substring(0, text.length()-1);
+        }
+
+        return text.trim();
     }
 
     private double toPosition(String text) {
