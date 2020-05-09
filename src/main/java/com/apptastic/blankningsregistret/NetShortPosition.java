@@ -24,6 +24,7 @@
 package com.apptastic.blankningsregistret;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -32,6 +33,9 @@ import java.util.Optional;
  * Class represent the net short position.
  */
 public class NetShortPosition implements Comparable<NetShortPosition> {
+    private static final Comparator<NetShortPosition> COMPARATOR = Comparator.comparing(NetShortPosition::getPositionDate)
+                                                                              .thenComparing(NetShortPosition::getIssuer)
+                                                                              .thenComparing(NetShortPosition::getPositionHolder);
     private static final double SIGNIFICANT_POSITION = 0.5;
     private String positionHolder;
     private String issuer;
@@ -209,6 +213,6 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
 
     @Override
     public int compareTo(NetShortPosition o) {
-        return positionDate.compareTo(o.positionDate);
+        return COMPARATOR.compare(this, o);
     }
 }
