@@ -178,7 +178,7 @@ public class Blankningsregistret {
         if (date.length() == 10)
             return LocalDate.parse(date, dateFormat);
 
-        LocalDate epoch = LocalDate.of(1899, 11, 30);
+        LocalDate epoch = LocalDate.of(1899, 12, 30);
         epoch = epoch.plusDays(Integer.parseInt(date));
 
         return epoch;
