@@ -42,8 +42,8 @@ public class NetShortPositionTest {
     public void testEquals() {
         NetShortPosition position1 = defaultNetShortPosition();
 
-        assertTrue(position1.equals(position1));
-        assertFalse(position1.equals("Position"));
+        assertEquals(position1, position1);
+        assertNotEquals("Position", position1);
         assertFalse(position1.isSignificantPosition());
         position1.setPositionInPercent(0.51);
         assertTrue(position1.isSignificantPosition());
