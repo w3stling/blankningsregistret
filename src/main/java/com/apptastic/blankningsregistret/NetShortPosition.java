@@ -60,6 +60,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
      * @param positionInPercent position in percent
      * @param positionDate position date
      * @param comment comment
+     * @param isSignificantPosition significant position
      */
     public NetShortPosition(String positionHolder, String issuer, String isin, double positionInPercent,
                             LocalDate positionDate, String comment, boolean isSignificantPosition) {
