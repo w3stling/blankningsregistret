@@ -210,8 +210,9 @@ public class Blankningsregistret {
         String issuer = toText(row[INDEX_ISSUER]);
         String isin = toText(row[INDEX_ISIN]);
         comment = toText(comment);
+        boolean isSignificantPosition = checkSignificantPosition(row[INDEX_POSITION]);
 
-        return new NetShortPosition(positionHolder, issuer, isin, position, positionDate, comment);
+        return new NetShortPosition(positionHolder, issuer, isin, position, positionDate, comment, isSignificantPosition);
     }
 
     private static String toText(String text) {
@@ -224,6 +225,10 @@ public class Blankningsregistret {
         }
 
         return text.trim();
+    }
+
+    private boolean checkSignificantPosition(String text) {
+        return text.trim().charAt(0) != '<';
     }
 
     private double toPosition(String text) {

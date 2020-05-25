@@ -35,7 +35,7 @@ public class NetShortPositionTest {
 
     private NetShortPosition defaultNetShortPosition() {
         return new NetShortPosition("JPMorgan Asset Management (UK) Ltd", "RaySearch Laboratories AB",
-                "SE0000135485", 0.43, LocalDate.of(2018, 5, 9), "Fallit under 0,5%");
+                "SE0000135485", 0.43, LocalDate.of(2018, 5, 9), "Fallit under 0,5%", false);
     }
 
     @Test
@@ -45,8 +45,6 @@ public class NetShortPositionTest {
         assertEquals(position1, position1);
         assertNotEquals("Position", position1);
         assertFalse(position1.isSignificantPosition());
-        position1.setPositionInPercent(0.51);
-        assertTrue(position1.isSignificantPosition());
         position1.setPositionInPercent(0.43);
 
 

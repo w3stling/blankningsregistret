@@ -36,13 +36,13 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
     private static final Comparator<NetShortPosition> COMPARATOR = Comparator.comparing(NetShortPosition::getPositionDate)
                                                                               .thenComparing(NetShortPosition::getIssuer)
                                                                               .thenComparing(NetShortPosition::getPositionHolder);
-    private static final double SIGNIFICANT_POSITION = 0.5;
     private String positionHolder;
     private String issuer;
     private String isin;
     private double positionInPercent;
     private LocalDate positionDate;
     private String comment;
+    private boolean isSignificantPosition;
 
     /**
      * Default constructor
@@ -62,7 +62,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
      * @param comment comment
      */
     public NetShortPosition(String positionHolder, String issuer, String isin, double positionInPercent,
-                            LocalDate positionDate, String comment) {
+                            LocalDate positionDate, String comment, boolean isSignificantPosition) {
 
         this.positionHolder = positionHolder;
         this.issuer = issuer;
@@ -70,6 +70,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
         this.positionInPercent = positionInPercent;
         this.positionDate = positionDate;
         this.comment = comment;
+        this.isSignificantPosition = isSignificantPosition;
     }
 
     /**
@@ -84,6 +85,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
         this.positionInPercent = o.positionInPercent;
         this.positionDate = o.positionDate;
         this.comment = o.comment;
+        this.isSignificantPosition = o.isSignificantPosition;
     }
 
     /**
@@ -187,7 +189,7 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
      * @return true if position is significant otherwise false
      */
     public boolean isSignificantPosition() {
-        return positionInPercent > SIGNIFICANT_POSITION;
+        return isSignificantPosition;
     }
 
     @Override
@@ -202,13 +204,14 @@ public class NetShortPosition implements Comparable<NetShortPosition> {
                 Objects.equals(getIssuer(), that.getIssuer()) &&
                 Objects.equals(getIsin(), that.getIsin()) &&
                 Objects.equals(getPositionDate(), that.getPositionDate()) &&
-                Objects.equals(getComment(), that.getComment());
+                Objects.equals(getComment(), that.getComment()) &&
+                isSignificantPosition() == that.isSignificantPosition();
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getPositionHolder(), getIssuer(), getIsin(), getPositionInPercent(),
-                getPositionDate(), getComment());
+                getPositionDate(), getComment(), isSignificantPosition());
     }
 
     @Override
