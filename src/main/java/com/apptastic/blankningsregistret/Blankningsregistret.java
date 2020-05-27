@@ -146,7 +146,7 @@ public class Blankningsregistret {
         var resultActive = sendAsyncRequest(urlActive).thenApply(processResponse());
 
         try {
-            return Stream.concat(resultActive.get(30, TimeUnit.SECONDS), resultHistorical.get(30, TimeUnit.SECONDS))
+            return Stream.concat(resultActive.get(45, TimeUnit.SECONDS), resultHistorical.get(45, TimeUnit.SECONDS))
                          .sorted(Comparator.comparing(NetShortPosition::getPositionDate).reversed());
         } catch (CompletionException e) {
             try {
@@ -156,7 +156,10 @@ public class Blankningsregistret {
             } catch(Throwable e2) {
                 throw new AssertionError(e2);
             }
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException(e);
+        } catch (ExecutionException | TimeoutException e) {
             throw new IOException(e);
         }
     }
