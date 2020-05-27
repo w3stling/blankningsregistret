@@ -46,8 +46,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -147,7 +146,7 @@ public class Blankningsregistret {
         var resultActive = sendAsyncRequest(urlActive).thenApply(processResponse());
 
         try {
-            return Stream.concat(resultActive.join(), resultHistorical.join())
+            return Stream.concat(resultActive.get(30, TimeUnit.SECONDS), resultHistorical.get(30, TimeUnit.SECONDS))
                          .sorted(Comparator.comparing(NetShortPosition::getPositionDate).reversed());
         } catch (CompletionException e) {
             try {
@@ -157,6 +156,8 @@ public class Blankningsregistret {
             } catch(Throwable e2) {
                 throw new AssertionError(e2);
             }
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new IOException(e);
         }
     }
 
@@ -242,7 +243,7 @@ public class Blankningsregistret {
 
     private CompletableFuture<HttpResponse<InputStream>> sendAsyncRequest(String url) {
         var request = HttpRequest.newBuilder(URI.create(url))
-                .timeout(Duration.ofSeconds(15))
+                .timeout(Duration.ofSeconds(20))
                 .header("Accept-Encoding", "gzip")
                 .header("User-Agent", HTTP_USER_AGENT)
                 .GET()
@@ -255,8 +256,9 @@ public class Blankningsregistret {
     private Function<HttpResponse<InputStream>, Stream<NetShortPosition>> processResponse() {
         return response -> {
             try {
-                if (response.statusCode() == 404)
-                    throw new IOException("404 - Not Found");
+                if (response.statusCode() >= 400 && response.statusCode() < 600) {
+                    throw new IOException("Response http status code: " + response.statusCode());
+                }
 
                 var inputStream = response.body();
 
@@ -281,12 +283,12 @@ public class Blankningsregistret {
 
             httpClient = HttpClient.newBuilder()
                     .sslContext(context)
-                    .connectTimeout(Duration.ofSeconds(15))
+                    .connectTimeout(Duration.ofSeconds(20))
                     .followRedirects(HttpClient.Redirect.NORMAL)
                     .build();
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             httpClient = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(15))
+                    .connectTimeout(Duration.ofSeconds(20))
                     .followRedirects(HttpClient.Redirect.NORMAL)
                     .build();
         }
