@@ -23,8 +23,9 @@
  */
 package com.apptastic.blankningsregistret;
 
-import com.apptastic.blankningsregistret.internal.ExcelFileReader;
-import org.apache.poi.openxml4j.util.ZipSecureFile;
+import com.github.miachm.sods.Range;
+import com.github.miachm.sods.Sheet;
+import com.github.miachm.sods.SpreadSheet;
 
 import javax.net.ssl.SSLContext;
 import java.io.BufferedInputStream;
@@ -36,16 +37,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -59,8 +53,8 @@ import java.util.zip.GZIPInputStream;
  * Class for searching published net short position in the short selling registry (swedish Blankningsregistret) publish by Financial Supervisory Authority (Finansinspektionen).
  */
 public class Blankningsregistret {
-    private static final String URL_ACTIVE_FORMAT = "https://www.fi.se/contentassets/71a61417bb4c49c0a4a3a2582ea8af6c/aktuella_positioner_%1$s.xlsx";
-    private static final String URL_HISTORICAL_FORMAT = "https://www.fi.se/contentassets/71a61417bb4c49c0a4a3a2582ea8af6c/historiska_positioner_%1$s.xlsx";
+    private static final String URL_ACTIVE_FORMAT = "https://www.fi.se/sv/vara-register/blankningsregistret/GetAktuellFile/?_=%1$s";
+    private static final String URL_HISTORICAL_FORMAT = "https://www.fi.se/sv/vara-register/blankningsregistret/GetHistFile/?_=%1$s";
     private static final String HTTP_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
     private static final int INDEX_POSITION_HOLDER = 0;
     private static final int INDEX_ISSUER = 1;
@@ -75,77 +69,65 @@ public class Blankningsregistret {
      * Default constructor.
      */
     public Blankningsregistret() {
-        ZipSecureFile.setMinInflateRatio(0.0070);
         dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
     /**
-     * Searches for published net search positions from today's date.
+     * Search both active and historical net positions.
      *
-     * If the positions has not been yet been published for today then try the previous day.
-     * Maximum 30 day back from today's date if no position is found for that date.
      * @return stream of net short positions
      */
     public Stream<NetShortPosition> search() {
-        var searchDate = LocalDate.now(ZoneId.of("Europe/Stockholm"));
-        return search(searchDate, 30);
-    }
-
-    /**
-     * Searches for published net search positions from the given date.
-     *
-     * If the positions has not yet been been published for the given date then try the previous day
-     * up until the given max number of previous days.
-     * @param date date to search from
-     * @param maxPreviousDays search max previous days back from the given date if no position for the given date if found.
-     * @return stream of net short positions
-     *
-     * @deprecated Use LocalDate class instead of Date class
-     */
-    @SuppressWarnings("squid:S1133")
-    @Deprecated(since="2.1.0")
-    public Stream<NetShortPosition> search(Date date, int maxPreviousDays) {
-        LocalDate searchDate = LocalDate.ofInstant(date.toInstant(), ZoneId.of("Europe/Stockholm"));
-        return search(searchDate, maxPreviousDays);
-    }
-
-    /**
-     * Searches for published net search positions from the given date.
-     *
-     * If the positions has not yet been been published for the given date then try the previous day
-     * up until the given max number of previous days.
-     * @param date date to search from
-     * @param maxPreviousDays search max previous days back from the given date if no position for the given date if found.
-     * @return stream of net short positions
-     */
-    public Stream<NetShortPosition> search(LocalDate date, int maxPreviousDays) {
-        for (var i = 0; i < maxPreviousDays + 1; ++i) {
-            try {
-                var searchDateString = dateFormat.format(date);
-                return getStream(searchDateString);
-            }
-            catch (IOException e) {
-                var logger = Logger.getLogger(Blankningsregistret.class.getName());
-
-                if (logger.isLoggable(Level.FINER))
-                    logger.log(Level.FINER, "Failed to parse file. ", e);
-            }
-
-            date = date.minusDays(1);
+        try {
+            return getStream(System.currentTimeMillis(), true, true);
+        } catch (Exception e) {
+            return Stream.empty();
         }
+    }
 
-        return Stream.empty();
+    /**
+     * Search active net positions.
+     *
+     * @return stream of net short positions
+     */
+    public Stream<NetShortPosition> searchActivePositions() {
+        try {
+            return getStream(System.currentTimeMillis(), true, false);
+        } catch (Exception e) {
+            return Stream.empty();
+        }
+    }
+
+    /**
+     * Search historical net positions.
+     *
+     * @return stream of net short positions
+     */
+    public Stream<NetShortPosition> searchHistoricalPositions() {
+        try {
+            return getStream(System.currentTimeMillis(), false, true);
+        } catch (Exception e) {
+            return Stream.empty();
+        }
     }
 
     @SuppressWarnings("squid:S1181")
-    private Stream<NetShortPosition> getStream(String searchDateString) throws IOException {
-        var urlHistorical = String.format(URL_HISTORICAL_FORMAT, searchDateString);
-        var resultHistorical = sendAsyncRequest(urlHistorical).thenApply(processResponse());
-
-        var urlActive = String.format(URL_ACTIVE_FORMAT, searchDateString);
-        var resultActive = sendAsyncRequest(urlActive).thenApply(processResponse());
-
+    private Stream<NetShortPosition> getStream(long timestamp, boolean activePositions, boolean historicalPositions) throws IOException {
         try {
+            String searchDateString = String.valueOf(timestamp);
+            var urlHistorical = String.format(URL_HISTORICAL_FORMAT, String.valueOf(searchDateString));
+            var urlActive = String.format(URL_ACTIVE_FORMAT, searchDateString);
+
+            if (!activePositions && historicalPositions) {
+                var resultHistorical = sendAsyncRequest(urlHistorical).thenApply(processResponse());
+                return resultHistorical.get(45, TimeUnit.SECONDS).sorted(Comparator.comparing(NetShortPosition::getPositionDate).reversed());
+            } else if (activePositions && !historicalPositions) {
+                var resultActive = sendAsyncRequest(urlActive).thenApply(processResponse());
+                return resultActive.get(45, TimeUnit.SECONDS).sorted(Comparator.comparing(NetShortPosition::getPositionDate).reversed());
+            }
+
+            var resultHistorical = sendAsyncRequest(urlHistorical).thenApply(processResponse());
+            var resultActive = sendAsyncRequest(urlActive).thenApply(processResponse());
             return Stream.concat(resultActive.get(45, TimeUnit.SECONDS), resultHistorical.get(45, TimeUnit.SECONDS))
                          .sorted(Comparator.comparing(NetShortPosition::getPositionDate).reversed());
         } catch (CompletionException e) {
@@ -166,13 +148,14 @@ public class Blankningsregistret {
 
     private Stream<NetShortPosition> parsResponse(InputStream is) {
         if (is != null) {
-            var reader = new ExcelFileReader(is);
-            var rowIterator = reader.getIterator();
-            var targetStream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(rowIterator, Spliterator.ORDERED), false);
-
-            return targetStream.filter(r -> r.length == 5 || r.length == 6)
-                    .map(this::createNetShortPosition)
-                    .filter(Objects::nonNull);
+            try {
+                var spread = new SpreadSheet(is);
+                var sheet = spread.getSheet(0);
+                Iterator<NetShortPosition> rowIterator = new SheetRowIterator(sheet);
+                return StreamSupport.stream(Spliterators.spliteratorUnknownSize(rowIterator, Spliterator.ORDERED), false);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return Stream.empty();
@@ -297,5 +280,107 @@ public class Blankningsregistret {
         }
 
         return httpClient;
+    }
+
+    class SheetRowIterator implements Iterator<NetShortPosition> {
+        private Range range;
+        private int numberOfRows;
+        private int row;
+        private boolean skippRows;
+        private NetShortPosition next;
+
+        SheetRowIterator(Sheet sheet) {
+            this.range = sheet.getDataRange();
+            numberOfRows = range.getLastRow();
+            row = 0;
+            skippRows = true;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (skippRows) {
+                findHeader();
+                skippRows = false;
+            }
+
+            do {
+                next = getNextNetShortPosition();
+                ++row;
+            } while (row < numberOfRows && next == null);
+
+            return next != null;
+        }
+
+        @Override
+        public NetShortPosition next() {
+           return next;
+        }
+
+        private NetShortPosition getNextNetShortPosition() {
+            String positionHolder = getString(range, row, 0);
+            String issuer = getString(range, row, 1);
+            String isin = getString(range, row, 2);
+            String positionText = getString(range, row, 3);
+            String positionDateText = getString(range, row, 4);
+            String comment = getString(range, row, 5);
+
+            if (positionDateText == null || isin == null || isin.length() != 12) {
+                return null;
+            }
+
+            LocalDate positionDate;
+            double position;
+            try {
+                positionDate = toLocalDate(positionDateText);
+                position = toPosition(positionText);
+            }
+            catch (NumberFormatException e) {
+                Logger logger = Logger.getLogger(Blankningsregistret.class.getName());
+
+                if (logger.isLoggable(Level.WARNING))
+                    logger.log(Level.WARNING, "Failed to parse net short position. ", e);
+
+                return null;
+            }
+
+            boolean isSignificantPosition = checkSignificantPosition(positionText);
+            return new NetShortPosition(positionHolder, issuer, isin, position, positionDate, comment, isSignificantPosition);
+        }
+
+        private boolean findHeader() {
+            while (row < numberOfRows) {
+                String positionHolder = getString(range, row, 0);
+                String issuer = getString(range, row, 1);
+                String isin = getString(range, row, 2);
+                String position = getString(range, row, 3);
+                String positionDate = getString(range, row, 4);
+                ++row;
+
+                if (positionHolder != null && positionHolder.startsWith("Innehavare av positionen") &&
+                    issuer != null && issuer.startsWith("Namn på emittent") &&
+                    "ISIN".equalsIgnoreCase(isin) &&
+                    position != null && position.startsWith("Position i procent") &&
+                    positionDate != null && positionDate.startsWith("Datum för positionen")) {
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        String getString(Range range, int row, int column) {
+            Range r = range.getCell(row, column);
+            if (r == null) {
+                return null;
+            }
+            Object value = r.getValue();
+            if (value instanceof Double) {
+                return value.toString();
+            } else if (value instanceof LocalDateTime) {
+                return ((LocalDateTime)value).toLocalDate().toString();
+            }
+            return toText((String) r.getValue());
+        }
     }
 }

@@ -31,6 +31,5 @@ module com.apptastic.blankningsregistret {
     requires java.logging;
     requires java.xml;
     requires java.net.http;
-    requires poi.ooxml;
-    requires poi;
+    requires com.github.miachm.sods;
 }
