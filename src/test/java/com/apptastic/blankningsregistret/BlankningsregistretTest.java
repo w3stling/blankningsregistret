@@ -44,10 +44,10 @@ public class BlankningsregistretTest {
 
         Blankningsregistret br = new Blankningsregistret();
 
-        List<NetShortPosition> positions = br.search().collect(toList());
+        List<NetShortPosition> positions = br.search().limit(110).collect(toList());
 
         assertNotEquals(positions.size(), 0);
-        assertTrue(positions.size() > 2000);
+        assertTrue(positions.size() > 100);
 
         Pattern datePattern = Pattern.compile("20\\d{2}-\\d{2}-\\d{2}");
 
@@ -75,7 +75,7 @@ public class BlankningsregistretTest {
 
         Blankningsregistret br = new Blankningsregistret();
 
-        List<NetShortPosition> positions = br.searchActivePositions().collect(toList());
+        List<NetShortPosition> positions = br.searchActivePositions().limit(60).collect(toList());
 
         assertNotEquals(positions.size(), 0);
         assertTrue(positions.size() > 50);
@@ -106,10 +106,10 @@ public class BlankningsregistretTest {
 
         Blankningsregistret br = new Blankningsregistret();
 
-        List<NetShortPosition> positions = br.searchHistoricalPositions().collect(toList());
+        List<NetShortPosition> positions = br.searchHistoricalPositions().limit(110).collect(toList());
 
         assertNotEquals(positions.size(), 0);
-        assertTrue(positions.size() > 2000);
+        assertTrue(positions.size() > 100);
 
         Pattern datePattern = Pattern.compile("20\\d{2}-\\d{2}-\\d{2}");
 
