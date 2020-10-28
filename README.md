@@ -1,7 +1,7 @@
 Blankningsregistret
 ===============
 
-[![Build Status](https://travis-ci.org/w3stling/blankningsregistret.svg?branch=master)](https://travis-ci.org/w3stling/blankningsregistret)
+[![Build Status](https://travis-ci.com/w3stling/blankningsregistret.svg?branch=master)](https://travis-ci.com/w3stling/blankningsregistret)
 [![Download](https://api.bintray.com/packages/apptastic/maven-repo/blankningsregistret/images/download.svg)](https://bintray.com/apptastic/maven-repo/blankningsregistret/_latestVersion)
 [![Javadoc](https://img.shields.io/badge/javadoc-3.0.9-blue.svg)](https://w3stling.github.io/blankningsregistret/javadoc/3.0.9)
 [![License](http://img.shields.io/:license-MIT-blue.svg?style=flat-round)](http://apptastic-software.mit-license.org)   
